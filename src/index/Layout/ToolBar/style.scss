@@ -1,0 +1,42 @@
+.zl-warp {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #e5ecf3;
+    padding: 7px 20px;
+    .left {
+        display: flex;
+        >ul {
+            list-style: none;
+            margin: 0;
+            display: flex;
+            padding: 0 6px;
+            position: relative;
+            .arrow-icon {
+                width: 15px;
+                height: 15px;
+                margin-left: 3px;
+            }
+            &::after {
+                content: "";
+                position: absolute;
+                right: 0;
+                top: 8px;
+                height: 20px;
+                border-right: 1px solid #e5ecf3;
+            }
+            >li {
+                height: 28px;
+                padding: 4px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                &:hover {
+                    opacity: 0.6;
+                }
+                // img{
+                //     display: block;
+                // }
+            }
+        }
+    }
+}

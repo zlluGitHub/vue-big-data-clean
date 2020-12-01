@@ -1,0 +1,40 @@
+.zl-table-box {
+    .column-header {
+        font-family: Roboto, Helvetica, Arial, sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 25px;
+        text-align: center;
+        cursor: pointer;
+    }
+    .preview {
+        background: #fffbdc;
+    }
+    .source {
+        background: #eaf6ff;
+        border-left: 1px solid rgba(31, 150, 255, 0.75) !important;
+        border-right: 1px solid rgba(31, 150, 255, 0.75);
+    }
+    .order {
+        text-align: center;
+        cursor: pointer;
+    }
+
+    table {
+        text-align: left;
+        border-left: 1px solid rgba(36, 41, 46, 0.04);
+
+        // border-collapse: collapse; //表格的边框合并，如果相邻，则共用一个边框。
+        border-spacing: 0px; //设置行与单元格边框的间距。
+        tr {
+            th {
+                font-weight: lighter;
+                border-bottom: 1px solid rgba(36, 41, 46, 0.04);
+                border-right: 1px solid rgba(36, 41, 46, 0.04);
+                padding: 4px 6px;
+                font-family: Roboto Mono, monospace;
+                line-height: 14px;
+            }
+        }
+    }
+}
