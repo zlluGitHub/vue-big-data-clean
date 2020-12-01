@@ -8,7 +8,22 @@
       <DataStatistics :moduleObj="moduleObj" />
     </div>
     <div v-else-if="moduleObj.type === 'replace-word'" class="zl-drawer-item">
-      <ReplaceWord :moduleObj="moduleObj" />
+      <ReplaceWord
+        :moduleObj="moduleObj"
+        @on-button-click="handleOnButtonClick"
+      />
+    </div>
+    <div v-else-if="moduleObj.type === 'delete-word'" class="zl-drawer-item">
+      <DeleteWord
+        :moduleObj="moduleObj"
+        @on-button-click="handleOnButtonClick"
+      />
+    </div>
+    <div v-else-if="moduleObj.type === 'insert-word'" class="zl-drawer-item">
+      <InsertWord
+        :moduleObj="moduleObj"
+        @on-button-click="handleOnButtonClick"
+      />
     </div>
     <div v-else></div>
   </div>
@@ -16,10 +31,14 @@
 <script>
 import DataStatistics from "../../Modules/DataStatistics";
 import ReplaceWord from "../../Modules/ReplaceWord";
+import DeleteWord from "../../Modules/DeleteWord";
+import InsertWord from "../../Modules/InsertWord";
 export default {
   components: {
     DataStatistics,
+    DeleteWord,
     ReplaceWord,
+    InsertWord,
   },
   data() {
     return {
@@ -43,7 +62,12 @@ export default {
       this.moduleObj = item;
     });
   },
-  methods: {},
+  methods: {
+    handleOnButtonClick() {
+      console.log(this.info);
+      this.moduleObj = this.info;
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

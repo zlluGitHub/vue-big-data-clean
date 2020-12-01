@@ -16,16 +16,10 @@
       </li>
 
       <li>
-        <div class="title">元素替换</div>
+        <div class="title">需要删除的元素</div>
         <div class="content element-sub">
-          <div
-            class="item"
-            v-for="(item, i) in characterArr"
-            :key="item.source"
-          >
-            <Input v-model="item.source" placeholder="替换元素..." />
-            <Icon type="md-arrow-round-forward" />
-            <Input v-model="item.target" placeholder="目标元素..." />
+          <div class="item" v-for="(item, i) in characterArr" :key="item">
+            <Input v-model="characterArr[i]" placeholder="批量删除元素..." />
             <Icon
               type="ios-add-circle-outline"
               @click.stop="handleCharacterArr('add')"
@@ -70,7 +64,7 @@ export default {
         // },
       ],
       columnArr: [],
-      characterArr: [{ source: "", target: "" }],
+      characterArr: [""],
     };
   },
   props: ["moduleObj"],
@@ -96,7 +90,7 @@ export default {
   methods: {
     handleClearData() {
       this.columnArr = [];
-      this.characterArr = [{ source: "", target: "" }];
+      this.characterArr = [""];
     },
     handleOKOrCancel(mark) {
       if (mark === "ok") {
@@ -121,25 +115,18 @@ export default {
         this.columnArr.forEach((key, index) => {
           let text = item[key];
           if (text) {
-            newV.forEach((obj) => {
-              let { source, target } = obj;
-              let startIndex = text.indexOf(source);
-              let endIndex = startIndex + source.length;
+            newV.forEach((val) => {
+              let startIndex = text.indexOf(val);
+              let endIndex = startIndex + val.length;
               if (startIndex > -1) {
                 if (mark === "view") {
                   text =
                     text.slice(0, startIndex) +
-                    (source
-                      ? `<span class="del-highlight">${source}</span>`
-                      : "") +
-                    (target
-                      ? `<span class="rep-highlight">${target}</span>`
-                      : "") +
+                    (val ? `<span class="del-highlight">${val}</span>` : "") +
                     text.slice(endIndex, text.length);
                 } else {
                   text =
                     text.slice(0, startIndex) +
-                    target +
                     text.slice(endIndex, text.length);
                 }
               }
@@ -152,14 +139,14 @@ export default {
       this.$store.commit("setData", newData);
       if (mark !== "view") {
         this.$store.commit("setCopyData", newData);
-        // this.$Notice.success({ title: "批量替换成功！" });
+        // this.$Notice.success({ title: "批量操作成功！" });
       }
     },
     handleCharacterArr(mark, index) {
       if (index) {
         this.characterArr.splice(index - 1, 1);
       } else {
-        this.characterArr.push({ source: "", target: "" });
+        this.characterArr.push("");
       }
     },
   },

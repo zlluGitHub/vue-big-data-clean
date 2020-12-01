@@ -32,15 +32,15 @@ export const moduleConfig = {
     ],
     repInsWord: [
         {
-            title: "替换指定元素",
+            title: "批量替换指定元素",
             type: "replace-word",
         },
         {
-            title: "删除指定元素",
+            title: "批量删除指定元素",
             type: "delete-word",
         },
         {
-            title: "插入指定元素",
+            title: "批量插入指定元素",
             type: "insert-word",
         },
     ],

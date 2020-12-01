@@ -3,10 +3,14 @@ const state = {
   copyData: [],
   data: [],
   columns: [],
+  stepDataArr: []
 }
 const mutations = {
   setCopyData(state, data) {
     state.copyData = deepClone(data);
+  },
+  setStepDataArr(state, data) {
+    state.stepDataArr.push(data);
   },
   setData(state, data) {
     state.data = data;
