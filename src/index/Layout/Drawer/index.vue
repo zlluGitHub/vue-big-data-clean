@@ -5,10 +5,10 @@
       <img src="../../assets/delete.svg" />
     </div>
     <div v-if="moduleObj.type === 'data-tatistics'" class="zl-drawer-item">
-      <DataStatistics />
+      <DataStatistics :moduleObj="moduleObj" />
     </div>
     <div v-else-if="moduleObj.type === 'replace-word'" class="zl-drawer-item">
-      <ReplaceWord />
+      <ReplaceWord :moduleObj="moduleObj" />
     </div>
     <div v-else></div>
   </div>
@@ -23,19 +23,36 @@ export default {
   },
   data() {
     return {
-      moduleObj: {
-        title: "替换指定元素",
-        type: "replace-word",
-      },
+      moduleObj: this.info,
     };
   },
+  props: ["info"],
+  // watch: {
+  //   data: {
+  //     handler: function (data) {
+  //       if (this.data && this.data.length) {
+  //         console.log(data);
+  //       }
+  //     },
+  //     immediate: true,
+  //   },
+  // },
   created() {},
-  mounted() {},
+  mounted() {
+    this.$event.on("menu-type", (item) => {
+      this.moduleObj = item;
+    });
+  },
   methods: {},
 };
 </script>
 <style lang="scss" scoped>
 .zl-drawer-warp {
+  .zl-drawer-item {
+    padding: 0px 20px;
+    height: 90vh;
+    overflow: auto;
+  }
   .panel-toolbar {
     background: #f4f8fd;
     height: 42px;
@@ -51,24 +68,6 @@ export default {
       width: 16px;
       height: 16px;
       cursor: pointer;
-    }
-  }
-}
-</style>
-<style lang="scss">
-.zl-drawer-warp {
-  .zl-module-warp {
-    .title {
-      font-weight: 500;
-      color: #24292e;
-      font-size: 14px;
-      margin-top: 20px;
-      margin-bottom: 10px;
-    }
-  }
-  .drawer-box {
-    .zl-warp {
-      padding: 0 20px;
     }
   }
 }

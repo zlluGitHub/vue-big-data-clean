@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import variable from '../modules/variable'
+import dataState from './dataState'
 
 Vue.use(Vuex)
 const store = new Vuex.Store({
   modules: {
-    variable,
+    dataState,
   }
 });
 export default store;

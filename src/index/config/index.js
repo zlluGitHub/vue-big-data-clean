@@ -1,4 +1,4 @@
-let moduleConfig = {
+export const moduleConfig = {
     infoTatistics: {
         title: "数据统计信息",
         type: "data-tatistics",
@@ -30,17 +30,21 @@ let moduleConfig = {
             type: "columns-into-object",
         },
     ],
-    repInsWord:[
+    repInsWord: [
         {
             title: "替换指定元素",
             type: "replace-word",
+        },
+        {
+            title: "删除指定元素",
+            type: "delete-word",
         },
         {
             title: "插入指定元素",
             type: "insert-word",
         },
     ],
-    splitColumn:[
+    splitColumn: [
         {
             title: "以某个定界符拆分",
             type: "word-replace",
@@ -54,7 +58,4 @@ let moduleConfig = {
             type: "insert-replace",
         },
     ]
-
-
-
 }

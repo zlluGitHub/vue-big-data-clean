@@ -1,5 +1,5 @@
 <template>
-  <div class="zl-warp">
+  <div class="zl-tool-bar">
     <div class="left">
       <ul>
         <li><img src="../../assets/1.svg" /></li>
@@ -7,20 +7,38 @@
       </ul>
       <ul>
         <li>
-          <img src="../../assets/th.svg" />
-          <img src="../../assets/xxjt.svg" class="arrow-icon" />
-          <ol>
-            <li></li>
+          <div @click.stop="handleMenuSwitch('repInsWord')">
+            <img src="../../assets/th.svg" />
+            <img src="../../assets/xxjt.svg" class="arrow-icon" />
+          </div>
+          <ol v-if="moduleConfig.repInsWord && menuType === 'repInsWord'">
+            <li
+              v-for="(item, i) in moduleConfig.repInsWord"
+              :key="i"
+              @click="handleMenuClickItem(item)"
+            >
+              {{ item.title }}
+            </li>
           </ol>
         </li>
         <li>
-          <img src="../../assets/zkh.svg" />
-          <img src="../../assets/xxjt.svg" class="arrow-icon" />
-          <ol>
-            <li></li>
+          <div @click.stop="handleMenuSwitch('arrAndObj')">
+            <img src="../../assets/zkh.svg" />
+            <img src="../../assets/xxjt.svg" class="arrow-icon" />
+          </div>
+          <ol v-if="moduleConfig.arrAndObj && menuType === 'arrAndObj'">
+            <li
+              v-for="(item, i) in moduleConfig.arrAndObj"
+              :key="i"
+              @click="handleMenuClickItem(item)"
+            >
+              {{ item.title }}
+            </li>
           </ol>
         </li>
       </ul>
+      <!-- 遮罩层 -->
+      <div class="mask-box" v-if="menuType" @click.stop="handleMenuSwitch"></div>
     </div>
     <div class="right">登录</div>
   </div>
@@ -28,18 +46,40 @@
 <script>
 export default {
   name: "toolbar",
-  components: {
-    // Footer,
-  },
+  // components: {
+  //   // Footer,
+  // },
+  props: ["moduleConfig"],
+  // watch: {
+  //   moduleConfig: {
+  //     handler: function (config) {
+  //       this.menuData = config;
+  //     },
+  //     immediate: true,
+  //   },
+  // },
   data() {
     return {
-      // configure:{
-      // }
+      menuType: "",
     };
   },
   created() {},
-  mounted() {},
-  methods: {},
+  mounted() {
+    // console.log(moduleConfig);
+  },
+  methods: {
+    handleMenuClickItem(item) {
+      this.menuType = "";
+      this.$event.emit("menu-type", item);
+    },
+    handleMenuSwitch(type) {
+      if (type) {
+        this.menuType = type;
+      } else {
+        this.menuType = "";
+      }
+    },
+  },
 };
 </script>
 

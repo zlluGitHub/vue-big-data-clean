@@ -1,17 +1,22 @@
 <template>
   <div class="main">
     <div class="zl-toolbar-container">
-      <ToolBar />
+      <ToolBar :moduleConfig="menuData" />
     </div>
     <div class="zl-table-content">
-      <Table />
+      <Table
+        :data="tableData"
+        :column="['order', 'projectName', 'remark', 'target']"
+      />
     </div>
     <div class="zl-drawer-content">
-      <Drawer />
+      <Drawer :info="menuData.infoTatistics" />
     </div>
   </div>
 </template>
 <script>
+import { moduleConfig } from "./config/index";
+import contentData from "./data/data.json";
 import ToolBar from "./Layout/ToolBar/index";
 import Table from "./Layout/Table/index";
 import Drawer from "./Layout/Drawer/index";
@@ -23,10 +28,29 @@ export default {
     Drawer,
   },
   data() {
-    return {};
+    return {
+      menuData: moduleConfig,
+      tableData: [],
+    };
   },
+
+  computed: {
+    data() {
+      return this.$store.state.dataState.data; //需要监听的数据
+    },
+  },
+  watch: {
+    data(newVal, oldVal) {
+      this.tableData = newVal;
+    },
+  },
+
   created() {},
-  mounted() {},
+  mounted() {
+    this.tableData = contentData.data;
+    this.$store.commit("setData", contentData.data);
+    this.$store.commit("setCopyData", contentData.data);
+  },
   methods: {
     setSize() {},
   },
@@ -47,5 +71,5 @@ export default {
 }
 </style>
 <style lang="scss">
-@import "./style/gloable.scss"
+@import "./style/gloable.scss";
 </style>

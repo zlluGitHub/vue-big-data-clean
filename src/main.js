@@ -6,6 +6,12 @@ import 'font-awesome/css/font-awesome.css';
 import event from './utils/event';
 Vue.prototype.$event = event;
 
+import ViewUI from 'view-design';
+import 'view-design/dist/styles/iview.css';
+Vue.use(ViewUI);
+
+import TextHighlight from 'vue-text-highlight';
+Vue.component('text-highlight', TextHighlight);
 
 //引入axios
 import axios from 'axios';

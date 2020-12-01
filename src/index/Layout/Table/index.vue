@@ -47,9 +47,8 @@
           <div
             v-else
             @click.stop="handleSelectBlockClick(m, n, item[each.key])"
-          >
-            {{ item[each.key] }}
-          </div>
+            v-html="item[each.key]"
+          ></div>
         </th>
       </tr>
     </table>
@@ -63,45 +62,54 @@ export default {
   data() {
     return {
       selectClass: {},
-      columns: [
-        {
-          title: "#",
-          key: "order",
-        },
-        {
-          title: "projectName",
-          key: "projectName",
-        },
-        {
-          title: "projectName_copy",
-          key: "projectName_copy",
-        },
-        {
-          title: "author",
-          key: "author",
-        },
-        {
-          title: "remark",
-          key: "remark",
-        },
-        {
-          title: "root",
-          key: "root",
-        },
-        {
-          title: "time",
-          key: "time",
-        },
-      ],
+      columns: [],
       tableData: [],
     };
   },
+  props: ["data", "column"],
+  watch: {
+    data: {
+      handler: function (data) {
+        console.log(data);
+        if (this.data && this.data.length) {
+          let columns = [
+            {
+              title: "#",
+              key: "order",
+            }
+          ];
+          for (const key in data[0]) {
+            columns.push({
+              title: key,
+              key: key,
+            });
+          }
+          if (typeof this.column === "number") {
+            this.columns = columns.slice(0, this.column);
+          } else if (this.column instanceof Array) {
+            this.columns = this.column.map((item) => {
+              return {
+                title: item,
+                key: item,
+              };
+            });
+          } else {
+            this.columns = columns;
+          }
+          this.$store.commit("setColumns", this.columns);
+
+          this.tableData = data;
+        }
+      },
+      immediate: true,
+    },
+  },
   mounted() {
-    let data1 = data.data;
-    this.tableData = data1.map((item, i) => {
-      item.projectName_copy = "23_" + i;
-      return item;
-    });
+    // let data1 = data.data;
+    // this.tableData = data1.map((item, i) => {
+    //   item.projectName_copy = "23_" + i;
+    //   return item;
+    // });
     // console.log(this.tableData);
   },
   methods: {
