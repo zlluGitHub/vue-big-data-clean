@@ -2,19 +2,11 @@
   <div class="drawer-box">
     <ul>
       <li>
-        <div class="title">选择列（可多选）</div>
+        <div class="title">选择列数据</div>
         <div class="content">
-          <Select v-model="columnArr" multiple>
-            <Option
-              v-for="item in columnList"
-              :value="item.value"
-              :key="item.value"
-              >{{ item.label }}</Option
-            >
-          </Select>
+          <SelectColumn v-model="columnArr" />
         </div>
       </li>
-
       <li>
         <div class="title">元素替换</div>
         <div class="content element-sub">
@@ -56,42 +48,32 @@
   </div>
 </template>
 <script>
-import { deepClone } from "../../../utils/index";
+import SelectColumn from "../../components/SelectColumn/index";
+import { deepClone } from "../../utils/index";
+import { replaceWord } from "../../utils/processing";
 export default {
-  components: {},
+  components: { SelectColumn },
   data() {
     return {
       animal: null,
       dataState: this.$store.state.dataState,
-      columnList: [
-        // {
-        //   value: "New York",
-        //   label: "New York",
-        // },
-      ],
       columnArr: [],
       characterArr: [{ source: "", target: "" }],
     };
   },
   props: ["moduleObj"],
   watch: {
-    // columnArr: {
-    //   deep: true, //深度监听设置为 true
-    //   handler: function (newV, oldV) {
-    //     console.log(newV);
-    //   },
-    // },
     characterArr: {
-      deep: true, //深度监听设置为 true
+      deep: true,
       handler: function (newV, oldV) {
         this.handleData(newV, "view");
       },
     },
   },
-  created() {},
-  mounted() {
-    let { columns } = this.dataState;
-    this.columnList = columns;
+  created() {
+    this.columnArr = this.dataState.columns.map((item) => {
+      return item.value;
+    });
   },
   methods: {
     handleClearData() {
@@ -117,38 +99,14 @@ export default {
     handleData(newV, mark) {
       let { copyData } = this.dataState;
       let newData = deepClone(copyData);
-      newData = newData.map((item, i) => {
-        this.columnArr.forEach((key, index) => {
-          let text = item[key];
-          if (text) {
-            newV.forEach((obj) => {
-              let { source, target } = obj;
-              let startIndex = text.indexOf(source);
-              let endIndex = startIndex + source.length;
-              if (startIndex > -1) {
-                if (mark === "view") {
-                  text =
-                    text.slice(0, startIndex) +
-                    (source
-                      ? `<span class="del-highlight">${source}</span>`
-                      : "") +
-                    (target
-                      ? `<span class="rep-highlight">${target}</span>`
-                      : "") +
-                    text.slice(endIndex, text.length);
-                } else {
-                  text =
-                    text.slice(0, startIndex) +
-                    target +
-                    text.slice(endIndex, text.length);
-                }
-              }
-              item[key] = text;
-            });
-          }
-        });
-        return item;
-      });
+      newData = replaceWord(
+        newData,
+        {
+          columnArr: this.columnArr,
+          characterArr: newV,
+        },
+        mark
+      );
       this.$store.commit("setData", newData);
       if (mark !== "view") {
         this.$store.commit("setCopyData", newData);

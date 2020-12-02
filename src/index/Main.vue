@@ -1,15 +1,17 @@
 <template>
   <div class="main">
-    <div class="zl-toolbar-container">
-      <ToolBar :moduleConfig="menuData" />
+    <div class="left">
+      <div class="zl-toolbar-container">
+        <ToolBar :moduleConfig="menuData" />
+      </div>
+      <div class="zl-table-content">
+        <Table
+          :data="tableData"
+          :column="['order', 'projectName', 'remark', 'target']"
+        />
+      </div>
     </div>
-    <div class="zl-table-content">
-      <Table
-        :data="tableData"
-        :column="['order', 'projectName', 'remark', 'target']"
-      />
-    </div>
-    <div class="zl-drawer-content">
+    <div class="right">
       <Drawer :info="menuData.infoTatistics" />
     </div>
   </div>
@@ -59,8 +61,35 @@ export default {
 
 <style lang="scss" scoped>
 .main {
-  .zl-drawer-content {
-    width: 500px;
+  display: flex;
+  .left {
+    width: 75%;
+    .zl-table-content {
+      height: 95vh;
+      overflow: auto;
+      /* 设置滚动条的样式 */
+      &::-webkit-scrollbar {
+        width: 5px !important;
+        border-radius: 10px;
+        background-color: #e7e6eb;
+      }
+
+      /* 滚动槽 */
+      &::-webkit-scrollbar-track {
+        border-radius: 10px;
+      }
+
+      /* 滚动条滑块 */
+      &::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        cursor: pointer;
+        background: #b4bccd;
+      }
+    }
+  }
+  .right {
+    width: 25%;
+    // width: 500px;
     position: fixed;
     top: 0;
     right: 0;

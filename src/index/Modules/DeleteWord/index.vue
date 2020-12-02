@@ -4,14 +4,7 @@
       <li>
         <div class="title">选择列（可多选）</div>
         <div class="content">
-          <Select v-model="columnArr" multiple>
-            <Option
-              v-for="item in columnList"
-              :value="item.value"
-              :key="item.value"
-              >{{ item.label }}</Option
-            >
-          </Select>
+          <SelectColumn v-model="columnArr" />
         </div>
       </li>
 
@@ -32,16 +25,6 @@
           </div>
         </div>
       </li>
-      <!-- <li>
-        <div class="title">匹配限制</div>
-        <div class="content element-sub">
-          <RadioGroup v-model="animal">
-            <Radio border label="忽略大小写元素"></Radio>
-            <Radio border label="匹配大写元素"></Radio>
-            <Radio border label="匹配小写元素"></Radio>
-          </RadioGroup>
-        </div>
-      </li> -->
     </ul>
     <div class="button-warp">
       <Button @click="handleOKOrCancel(false)">取消</Button>
@@ -50,43 +33,28 @@
   </div>
 </template>
 <script>
-import { deepClone } from "../../../utils/index";
+import { deepClone } from "../../utils";
+import SelectColumn from "../../components/SelectColumn/index";
+import { deleteWord } from "../../utils/processing";
 export default {
-  components: {},
+  components: { SelectColumn },
   data() {
     return {
-      animal: null,
       dataState: this.$store.state.dataState,
-      columnList: [
-        // {
-        //   value: "New York",
-        //   label: "New York",
-        // },
-      ],
       columnArr: [],
       characterArr: [""],
     };
   },
   props: ["moduleObj"],
   watch: {
-    // columnArr: {
-    //   deep: true, //深度监听设置为 true
-    //   handler: function (newV, oldV) {
-    //     console.log(newV);
-    //   },
-    // },
     characterArr: {
-      deep: true, //深度监听设置为 true
+      deep: true,
       handler: function (newV, oldV) {
         this.handleData(newV, "view");
       },
     },
   },
-  created() {},
-  mounted() {
-    let { columns } = this.dataState;
-    this.columnList = columns;
-  },
+
   methods: {
     handleClearData() {
       this.columnArr = [];
@@ -111,31 +79,14 @@ export default {
     handleData(newV, mark) {
       let { copyData } = this.dataState;
       let newData = deepClone(copyData);
-      newData = newData.map((item, i) => {
-        this.columnArr.forEach((key, index) => {
-          let text = item[key];
-          if (text) {
-            newV.forEach((val) => {
-              let startIndex = text.indexOf(val);
-              let endIndex = startIndex + val.length;
-              if (startIndex > -1) {
-                if (mark === "view") {
-                  text =
-                    text.slice(0, startIndex) +
-                    (val ? `<span class="del-highlight">${val}</span>` : "") +
-                    text.slice(endIndex, text.length);
-                } else {
-                  text =
-                    text.slice(0, startIndex) +
-                    text.slice(endIndex, text.length);
-                }
-              }
-              item[key] = text;
-            });
-          }
-        });
-        return item;
-      });
+      newData = deleteWord(
+        newData,
+        {
+          columnArr: this.columnArr,
+          characterArr: newV,
+        },
+        mark
+      );
       this.$store.commit("setData", newData);
       if (mark !== "view") {
         this.$store.commit("setCopyData", newData);

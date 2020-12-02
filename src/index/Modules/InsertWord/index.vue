@@ -4,14 +4,7 @@
       <li>
         <div class="title">选择列（可多选）</div>
         <div class="content">
-          <Select v-model="columnArr" multiple>
-            <Option
-              v-for="item in columnList"
-              :value="item.value"
-              :key="item.value"
-              >{{ item.label }}</Option
-            >
-          </Select>
+          <SelectColumn v-model="columnArr" />
         </div>
       </li>
       <li>
@@ -78,19 +71,15 @@
   </div>
 </template>
 <script>
-import { deepClone } from "../../../utils/index";
+import { deepClone } from "../../utils";
+import SelectColumn from "../../components/SelectColumn/index";
+import { insertWordFun } from "../../utils/processing";
 export default {
-  components: {},
+  components: { SelectColumn },
   data() {
     return {
       dataState: this.$store.state.dataState,
       columnArr: [],
-      columnList: [
-        // {
-        //   value: "New York",
-        //   label: "New York",
-        // },
-      ],
       matchRules: "",
       matchRulesList: [
         {
@@ -115,8 +104,6 @@ export default {
         front: null,
         after: null,
       },
-
-      // characterArr: [{ source: "", target: "" }],
     };
   },
   props: ["moduleObj"],
@@ -127,26 +114,13 @@ export default {
         this.handleData("view");
       },
     },
-    // insertWordObj: {
-    //   deep: true,
-    //   handler: function (newV, oldV) {
-    //     this.handleData("view");
-    //   },
-    // },
     insertWord: {
-      // deep: true,
       handler: function (newV, oldV) {
         this.handleData("view");
       },
     },
-    // characterArr: {
-    //   deep: true, //深度监听设置为 true
-    //   handler: function (newV, oldV) {
-    //     this.handleData(newV, "view");
-    //   },
-    // },
   },
-  created() {},
+  // created() {},
   mounted() {
     let { columns } = this.dataState;
     this.columnList = columns;
@@ -154,7 +128,6 @@ export default {
   methods: {
     handleClearData() {
       this.columnArr = [];
-      // this.characterArr = [{ source: "", target: "" }];
     },
     handleOKOrCancel(mark) {
       if (mark === "ok") {
@@ -163,6 +136,7 @@ export default {
         this.$store.commit("setStepDataArr", {
           module: this.moduleObj,
           columnArr: this.columnArr,
+          matchRules: this.matchRules,
           insertWord: this.insertWord,
           insertWordObj: this.insertWordObj,
         });
@@ -177,100 +151,24 @@ export default {
     handleData(mark) {
       let { copyData } = this.dataState;
       let newData = deepClone(copyData);
-      newData = newData.map((item, i) => {
-        this.columnArr.forEach((key, index) => {
-          let text = item[key];
-          if (text) {
-            if (mark === "view") {
-              if (this.matchRules === "start") {
-                text =
-                  (this.insertWord
-                    ? `<span class="add-highlight">${this.insertWord}</span>`
-                    : "") + text;
-              } else if (this.matchRules === "end") {
-                text =
-                  text +
-                  (this.insertWord
-                    ? `<span class="add-highlight">${this.insertWord}</span>`
-                    : "");
-              } else if (this.matchRules === "between") {
-                let startIndex = text.indexOf(this.insertWordObj.front);
-                let endIndex = text.indexOf(this.insertWordObj.after);
-                if (startIndex > -1 && endIndex > -1) {
-                  //  console.log(startIndex,endIndex);
-                  text =
-                    text.slice(
-                      0,
-                      startIndex + this.insertWordObj.front.length
-                    ) +
-                    (this.insertWord
-                      ? `<span class="add-highlight">${this.insertWord}</span>`
-                      : "") +
-                    text.slice(endIndex, text.length);
-                }
-              } else if (this.matchRules === "position") {
-                if (
-                  this.insertWordObj.front * 1 < text.length &&
-                  this.insertWordObj.after * 1 < text.length
-                ) {
-                  // console.log(this.insertWordObj);
-                  text =
-                    text.slice(0, this.insertWordObj.front) +
-                    (this.insertWord
-                      ? `<span class="add-highlight">${this.insertWord}</span>`
-                      : "") +
-                    text.slice(this.insertWordObj.after, text.length);
-                }
-              }
-            } else {
-              if (this.matchRules === "start") {
-                text = this.insertWord + text;
-              } else if (this.matchRules === "end") {
-                text = text + this.insertWord;
-              } else if (this.matchRules === "between") {
-                let startIndex = text.indexOf(this.insertWordObj.front);
-                let endIndex = text.indexOf(this.insertWordObj.after);
-                if (startIndex > -1 && endIndex > -1) {
-                  text =
-                    text.slice(
-                      0,
-                      startIndex + this.insertWordObj.front.length
-                    ) +
-                    this.insertWord +
-                    text.slice(endIndex, text.length);
-                }
-              } else if (this.matchRules === "position") {
-                if (
-                  this.insertWordObj.front * 1 < text.length &&
-                  this.insertWordObj.after * 1 < text.length
-                ) {
-                  text =
-                    text.slice(0, this.insertWordObj.front) +
-                    this.insertWord +
-                    text.slice(this.insertWordObj.after, text.length);
-                }
-              }
-            }
 
-            item[key] = text;
-          }
-        });
-        return item;
-      });
+      newData = insertWordFun(
+        newData,
+        {
+          columnArr: this.columnArr,
+          matchRules: this.matchRules,
+          insertWord: this.insertWord,
+          insertWordObj: this.insertWordObj,
+        },
+        mark
+      );
+
       this.$store.commit("setData", newData);
       if (mark !== "view") {
         this.$store.commit("setCopyData", newData);
         // this.$Notice.success({ title: "批量替换成功！" });
       }
     },
-
-    // handleCharacterArr(mark, index) {
-    //   if (index) {
-    //     this.characterArr.splice(index - 1, 1);
-    //   } else {
-    //     this.characterArr.push({ source: "", target: "" });
-    //   }
-    // },
   },
 };
 </script>

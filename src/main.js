@@ -3,15 +3,15 @@ import App from './App.vue';
 
 import 'font-awesome/css/font-awesome.css';
 
-import event from './utils/event';
+import event from './index/utils/event';
 Vue.prototype.$event = event;
 
 import ViewUI from 'view-design';
 import 'view-design/dist/styles/iview.css';
 Vue.use(ViewUI);
 
-import TextHighlight from 'vue-text-highlight';
-Vue.component('text-highlight', TextHighlight);
+// import TextHighlight from 'vue-text-highlight';
+// Vue.component('text-highlight', TextHighlight);
 
 //引入axios
 import axios from 'axios';
@@ -27,7 +27,7 @@ Vue.prototype.$qs = qs           //全局注册，使用方法为:this.$qs
 Vue.config.productionTip = false
 
 //实例化 store
-import store from './store'; // this.$store.commit("setUser", user); 
+import store from './index/store'; // this.$store.commit("setUser", user); 
 
 //引入路由文件
 import router from './router';
