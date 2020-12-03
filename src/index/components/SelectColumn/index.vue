@@ -62,6 +62,7 @@
   </div>
 </template>
 <script>
+import { deepClone } from "../../utils";
 export default {
   data() {
     return {
@@ -100,9 +101,21 @@ export default {
   },
   watch: {
     columnArr: {
-      deep: true,
+      // deep: true,
       handler: function (newV, oldV) {
-        this.$emit("returnBack", newV);
+        if (newV.length) {
+          let { columnsCopy } = this.dataState;
+          let newColumnsCopy = deepClone(columnsCopy);
+          newColumnsCopy.forEach((item) => {
+            if (newV.indexOf(item.value) > -1) {
+              item.state = "source";
+            } else {
+              item.state = "";
+            }
+          });
+          this.$store.commit("setColumns", newColumnsCopy);
+          this.$emit("returnBack", newV);
+        }
       },
     },
     rangeValue: {
@@ -114,14 +127,14 @@ export default {
     seniorValue: {
       deep: true,
       handler: function (newV, oldV) {
-        console.log(newV);
+        // console.log(newV);
         let columnArr = [];
         if (newV.indexOf(",") > -1) {
           let split = newV.split(",");
           split.forEach((item) => {
             if (item.indexOf("~") > -1) {
               let splitA = item.split("~");
-              console.log(splitA);
+              // console.log(splitA);
               columnArr = [
                 ...columnArr,
                 ...this.handleColumnMatch(splitA[0], splitA[1]),
@@ -139,15 +152,15 @@ export default {
             this.columnArr = [newV];
           }
         }
-        console.log(this.columnArr);
+        // console.log(this.columnArr);
         // this.columnArr = columnArr;
       },
     },
   },
 
   created() {
-    let { columns } = this.dataState;
-    this.columnList = columns;
+    let { columnsCopy } = this.dataState;
+    this.columnList = columnsCopy;
   },
 
   methods: {

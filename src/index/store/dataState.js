@@ -2,8 +2,16 @@ import { deepClone } from "../utils/index"
 const state = {
   copyData: [],
   data: [],
+
   columns: [],
-  stepDataArr: []
+  columnsCopy: [],
+
+  stepDataArr: [],
+
+  previewData:{
+    columns:[],
+    tableData:[]
+  }
 }
 const mutations = {
   setCopyData(state, data) {
@@ -16,12 +24,14 @@ const mutations = {
     state.data = data;
   },
   setColumns(state, data) {
-    state.columns = data.map(item => {
-      return {
-        value: item.key,
-        label: item.title
-      }
-    });
+    // console.log(data);
+    state.columns = deepClone(data) ;
+  },
+  setColumnsCopy(state, data) {
+    state.columnsCopy = data;
+  },
+  setPreviewData(state, data) {
+    state.previewData = data;
   }
 }
 const actions = {

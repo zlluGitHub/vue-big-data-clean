@@ -63,8 +63,8 @@ export const deleteWord = (newData, option, mark) => {
         return item;
     });
 }
-// 批量插入指定元素
 
+// 批量插入指定元素
 export const insertWordFun = (newData, option, mark) => {
     let { columnArr, matchRules, insertWord, insertWordObj } = option;
     return newData.map((item, i) => {
@@ -147,4 +147,28 @@ export const insertWordFun = (newData, option, mark) => {
         });
         return item;
     });
+};
+
+export const columnsIntoArray = (newData, option) => {
+    let { columnArr, columnName } = option;;
+    let columnNamePar = "";
+    let newTableData = newData.map((item, i) => {
+        let itemObj = {}, newArr = [];
+        columnArr.forEach((key, index) => {
+            if (item[key]) {
+                newArr.push(item[key]);
+                columnNamePar = columnName ? columnName : key + '_copy';
+            };
+        });
+        itemObj[columnNamePar] = JSON.stringify(newArr);
+        return itemObj;
+    });
+    
+    return {
+        columns: [{
+            label: columnNamePar,
+            value: columnNamePar,
+        }], tableData: newTableData
+    }
+
 }

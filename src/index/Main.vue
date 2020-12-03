@@ -5,10 +5,13 @@
         <ToolBar :moduleConfig="menuData" />
       </div>
       <div class="zl-table-content">
-        <Table
-          :data="tableData"
-          :column="['order', 'projectName', 'remark', 'target']"
-        />
+        <div class="source">
+          <Table :data="tableData" :column="columnsData" />
+        </div>
+        <div class="preview" v-if="previewData.tableData&&previewData.columns">
+          <Table :data="previewData.tableData" :column="previewData.columns" />
+        </div>
+        <!-- <Table :data="tableData" :column="columnsData" /> -->
       </div>
     </div>
     <div class="right">
@@ -33,25 +36,54 @@ export default {
     return {
       menuData: moduleConfig,
       tableData: [],
+      columnsData: [],
+      previewData: {},
     };
   },
 
   computed: {
     data() {
-      return this.$store.state.dataState.data; //需要监听的数据
+      return this.$store.state.dataState.data;
+    },
+    column() {
+      return this.$store.state.dataState.columns;
+    },
+    preview() {
+      return this.$store.state.dataState.previewData;
     },
   },
   watch: {
     data(newVal, oldVal) {
+      console.log(newVal);
       this.tableData = newVal;
+    },
+    column(newVal, oldVal) {
+      console.log(newVal);
+      this.columnsData = newVal;
+    },
+    preview(newVal, oldVal) {
+      console.log(newVal);
+      this.previewData = newVal;
     },
   },
 
   created() {},
   mounted() {
-    this.tableData = contentData.data;
-    this.$store.commit("setData", contentData.data);
-    this.$store.commit("setCopyData", contentData.data);
+    let data = contentData.data;
+    let columns = [];
+    if (data.length) {
+      for (const key in data[0]) {
+        columns.push({
+          label: key,
+          value: key,
+        });
+      }
+    }
+
+    this.$store.commit("setData", data);
+    this.$store.commit("setColumns", columns);
+    this.$store.commit("setColumnsCopy", columns);
+    this.$store.commit("setCopyData", data);
   },
   methods: {
     setSize() {},
@@ -65,25 +97,36 @@ export default {
   .left {
     width: 75%;
     .zl-table-content {
-      height: 95vh;
-      overflow: auto;
-      /* 设置滚动条的样式 */
-      &::-webkit-scrollbar {
-        width: 5px !important;
-        border-radius: 10px;
-        background-color: #e7e6eb;
-      }
+      display: flex;
+      justify-content: space-between;
+      .source,
+      .preview {
+        height: 95vh;
+        overflow: auto;
+        /* 设置滚动条的样式 */
+        &::-webkit-scrollbar {
+          width: 5px;
+          border-radius: 10px;
+          background-color: #e7e6eb;
+          cursor: pointer;
+        }
+        /* 滚动槽 */
+        &::-webkit-scrollbar-track {
+          border-radius: 10px;
+        }
 
-      /* 滚动槽 */
-      &::-webkit-scrollbar-track {
-        border-radius: 10px;
+        /* 滚动条滑块 */
+        &::-webkit-scrollbar-thumb {
+          border-radius: 10px;
+          cursor: pointer;
+          background: #b4bccd;
+        }
       }
-
-      /* 滚动条滑块 */
-      &::-webkit-scrollbar-thumb {
-        border-radius: 10px;
-        cursor: pointer;
-        background: #b4bccd;
+      .source {
+        width: calc(100% - 350px);
+      }
+      .preview {
+        width: 350px;
       }
     }
   }

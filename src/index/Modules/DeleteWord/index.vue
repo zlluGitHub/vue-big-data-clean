@@ -53,6 +53,12 @@ export default {
         this.handleData(newV, "view");
       },
     },
+    columnArr: {
+      // deep: true,
+      handler: function (newV, oldV) {
+        this.handleData(newV, "view");
+      },
+    },
   },
 
   methods: {

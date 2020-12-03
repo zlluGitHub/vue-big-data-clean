@@ -63,6 +63,14 @@ export default {
   },
   props: ["moduleObj"],
   watch: {
+    // columnArr: {
+    //   // deep: true,
+    //   handler: function (newV, oldV) {
+    //     if (newV.length) {
+    //       this.handleData(newV, "view");
+    //     }
+    //   },
+    // },
     characterArr: {
       deep: true,
       handler: function (newV, oldV) {

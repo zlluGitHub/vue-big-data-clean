@@ -8,16 +8,17 @@
           :class="[
             'column-header',
             'column-header-' + i === selectClass.header ? 'source' : null,
+            item.state === 'source' ? 'select' : null,
           ]"
           @click.stop="
             handleSelectColumnClick(
-              item.title,
+              item.label,
               'column-header-' + i,
               'row-' + i
             )
           "
         >
-          {{ item.title }}
+          {{ item.label }}
         </th>
       </tr>
       <tr
@@ -34,11 +35,12 @@
           :class="[
             'row',
             'row-' + n === selectClass.row ? 'source' : null,
+            each.state === 'source' ? 'select' : null,
             m + '-' + n,
           ]"
         >
           <div
-            v-if="each.key == 'order'"
+            v-if="each.value == 'order'"
             class="order"
             @click.stop="handleSelectRowClick(m, 'column-' + m)"
           >
@@ -46,8 +48,8 @@
           </div>
           <div
             v-else
-            @click.stop="handleSelectBlockClick(m, n, item[each.key])"
-            v-html="item[each.key]"
+            @click.stop="handleSelectBlockClick(m, n, item[each.value])"
+            v-html="item[each.value]"
           ></div>
         </th>
       </tr>
@@ -56,7 +58,8 @@
 </template>
 
 <script>
-import data from "../../data/data.json";
+// import data from "../../data/data.json";
+// import { deepClone } from "../../utils/index.js";
 export default {
   name: "app",
   data() {
@@ -69,49 +72,39 @@ export default {
   props: ["data", "column"],
   watch: {
     data: {
+       deep:true,
       handler: function (data) {
-        console.log(data);
         if (this.data && this.data.length) {
-          let columns = [
-            {
-              title: "#",
-              key: "order",
-            }
-          ];
-          for (const key in data[0]) {
-            columns.push({
-              title: key,
-              key: key,
-            });
-          }
-          if (typeof this.column === "number") {
-            this.columns = columns.slice(0, this.column);
-          } else if (this.column instanceof Array) {
-            this.columns = this.column.map((item) => {
-              return {
-                title: item,
-                key: item,
-              };
-            });
-          } else {
-            this.columns = columns;
-          }
-          this.$store.commit("setColumns", this.columns);
-
           this.tableData = data;
         }
       },
       immediate: true,
     },
+    column: {
+      deep:true,
+      handler: function (columnArr) {
+        if (columnArr && columnArr.length) {
+          this.handleClearClick();
+          this.columns = [
+            {
+              label: "#",
+              value: "order",
+            },
+            ...columnArr,
+          ];
+        }
+      },
+      immediate: true,
+    },
   },
-  mounted() {
-    // let data1 = data.data;
-    // this.tableData = data1.map((item, i) => {
-    //   item.projectName_copy = "23_" + i;
-    //   return item;
-    // });
-    // console.log(this.tableData);
-  },
+  // mounted() {
+  //   // let data1 = data.data;
+  //   // this.tableData = data1.map((item, i) => {
+  //   //   item.projectName_copy = "23_" + i;
+  //   //   return item;
+  //   // });
+  //   // console.log(this.tableData);
+  // },
   methods: {
     // 选中某一块
     handleSelectBlockClick(m, n, item) {

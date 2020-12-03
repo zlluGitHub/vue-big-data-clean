@@ -109,7 +109,7 @@ export default {
   props: ["moduleObj"],
   watch: {
     columnArr: {
-      deep: true,
+      // deep: true,
       handler: function (newV, oldV) {
         this.handleData("view");
       },

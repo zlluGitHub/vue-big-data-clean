@@ -11,9 +11,14 @@
         background: #fffbdc;
     }
     .source {
+        background: rgba(255, 153, 0, 0.1);
+        // border-left: 1px solid rgba(31, 150, 255, 0.75) !important;
+        // border-right: 1px solid rgba(31, 150, 255, 0.75);
+    }
+    .select {
         background: #eaf6ff;
-        border-left: 1px solid rgba(31, 150, 255, 0.75) !important;
-        border-right: 1px solid rgba(31, 150, 255, 0.75);
+        // border-left: 1px solid rgba(31, 150, 255, 0.75) !important;
+        // border-right: 1px solid rgba(31, 150, 255, 0.75);
     }
     .order {
         text-align: center;
@@ -36,6 +41,5 @@
                 line-height: 14px;
             }
         }
-        
     }
 }
