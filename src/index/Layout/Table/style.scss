@@ -1,9 +1,13 @@
 .zl-table-box {
+    position: relative;
+
+    // thead{
+    //      position: absolute;
+    //     top: 0;
+    // }
     .column-header {
-        font-family: Roboto, Helvetica, Arial, sans-serif;
-        font-size: 13px;
-        font-weight: 500;
-        line-height: 25px;
+        font-size: 14px;
+        font-weight: 600;
         text-align: center;
         cursor: pointer;
     }
@@ -17,6 +21,7 @@
     }
     .select {
         background: #eaf6ff;
+        // background: #eaf6ff;
         // border-left: 1px solid rgba(31, 150, 255, 0.75) !important;
         // border-right: 1px solid rgba(31, 150, 255, 0.75);
     }
@@ -27,19 +32,39 @@
 
     table {
         text-align: left;
+        width: 100%;
         border-left: 1px solid rgba(36, 41, 46, 0.04);
-
+        border-collapse: collapse;
         // border-collapse: collapse; //表格的边框合并，如果相邻，则共用一个边框。
         border-spacing: 0px; //设置行与单元格边框的间距。
         tr {
-            th {
-                font-weight: lighter;
+            th,
+            td {
+                font-weight: 500;
                 border-bottom: 1px solid rgba(36, 41, 46, 0.04);
                 border-right: 1px solid rgba(36, 41, 46, 0.04);
-                padding: 4px 6px;
-                font-family: Roboto Mono, monospace;
-                line-height: 14px;
+                > div {
+                    padding: 3px 6px;
+                }
             }
         }
+    }
+
+    &::-webkit-scrollbar {
+        width: 5px;
+        border-radius: 10px;
+        background-color: #e7e6eb;
+        cursor: pointer;
+    }
+    /* 滚动槽 */
+    &::-webkit-scrollbar-track {
+        border-radius: 10px;
+    }
+
+    /* 滚动条滑块 */
+    &::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        cursor: pointer;
+        background: #b4bccd;
     }
 }

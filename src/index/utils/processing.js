@@ -150,7 +150,7 @@ export const insertWordFun = (newData, option, mark) => {
 };
 
 export const columnsIntoArray = (newData, option) => {
-    let { columnArr, columnName } = option;;
+    let { columnArr, columnName } = option;
     let columnNamePar = "";
     let newTableData = newData.map((item, i) => {
         let itemObj = {}, newArr = [];
@@ -163,7 +163,30 @@ export const columnsIntoArray = (newData, option) => {
         itemObj[columnNamePar] = JSON.stringify(newArr);
         return itemObj;
     });
-    
+
+    return {
+        columns: [{
+            label: columnNamePar,
+            value: columnNamePar,
+        }], tableData: newTableData
+    }
+}
+
+export const columnsIntoObj = (newData, option) => {
+    let { columnArr, columnName } = option;
+    let columnNamePar = "";
+    let newTableData = newData.map((item, i) => {
+        let itemObj = {}, newObj = {};
+        columnArr.forEach((key, index) => {
+            if (item[key]) {
+                newObj[key] = item[key];
+                columnNamePar = columnName ? columnName : key + '_copy';
+            };
+        });
+        itemObj[columnNamePar] = JSON.stringify(newObj);
+        return itemObj;
+    });
+
     return {
         columns: [{
             label: columnNamePar,

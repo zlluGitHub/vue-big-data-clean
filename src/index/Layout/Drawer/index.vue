@@ -31,6 +31,12 @@
         @on-button-click="handleOnButtonClick"
       />
     </div>
+    <div v-else-if="moduleObj.type === 'columns-into-object'" class="zl-drawer-item">
+      <ColumnsIntoObj
+        :moduleObj="moduleObj"
+        @on-button-click="handleOnButtonClick"
+      />
+    </div>
     <div v-else></div>
   </div>
 </template>
@@ -40,6 +46,7 @@ import ReplaceWord from "../../Modules/ReplaceWord";
 import DeleteWord from "../../Modules/DeleteWord";
 import InsertWord from "../../Modules/InsertWord";
 import ColumnsIntoArray from "../../Modules/ColumnsIntoArray";
+import ColumnsIntoObj from "../../Modules/ColumnsIntoObj";
 export default {
   components: {
     DataStatistics,
@@ -47,6 +54,7 @@ export default {
     ReplaceWord,
     InsertWord,
     ColumnsIntoArray,
+    ColumnsIntoObj,
   },
   data() {
     return {

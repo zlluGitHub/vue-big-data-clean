@@ -8,15 +8,9 @@
         </div>
       </li>
       <li>
-        <div class="title">新建列名</div>
+        <div class="title">新建列名称</div>
         <div class="content">
-          <Input v-model="objData.columnName" placeholder="新建列名..." />
-        </div>
-      </li>
-      <li>
-        <div class="title">新建键名</div>
-        <div class="content">
-          <Input v-model="objData.key" placeholder="新建列名..." />
+          <Input v-model="columnName" placeholder="新建列名..." />
         </div>
       </li>
     </ul>
@@ -29,23 +23,26 @@
 <script>
 import SelectColumn from "../../components/SelectColumn/index";
 import { deepClone } from "../../utils/index";
-import { columnsIntoArray } from "../../utils/processing";
+import { columnsIntoObj } from "../../utils/processing";
 export default {
   components: { SelectColumn },
   data() {
     return {
-      objData: {
-        columnName: "",
-        key: "",
-      },
+      columnName: "",
       dataState: this.$store.state.dataState,
       columnArr: [],
     };
   },
   props: ["moduleObj"],
   watch: {
-    objData: {
-      deep: true,
+    columnArr: {
+      // deep: true,
+      handler: function (newV, oldV) {
+        this.handleData("view");
+      },
+    },
+    columnName: {
+      // deep: true,
       handler: function (newV, oldV) {
         // console.log(newV);
         this.handleData("view");
@@ -60,37 +57,34 @@ export default {
       this.columnArr = [];
     },
     handleOKOrCancel(mark) {
+      let { copyData, columnsCopy } = this.dataState;
       if (mark === "ok") {
         // 缓存数据
         this.handleData();
         this.$store.commit("setStepDataArr", {
-          module: this.moduleObj,
           columnArr: this.columnArr,
-          columnArr: this.columnArr,
+          columnName: this.columnName,
         });
       } else {
-        let { copyData, columnsCopy } = this.dataState;
         this.$store.commit("setColumns", columnsCopy);
         this.$store.commit("setData", deepClone(copyData));
         this.handleClearData();
       }
+      this.$store.commit("setPreviewData", { show: false });
       this.$emit("on-button-click");
     },
     handleData(mark) {
       let { copyData, columnsCopy } = this.dataState;
-      let backData = columnsIntoArray(
-        deepClone(copyData),
-        {
-          columnArr: this.columnArr,
-          columnAll: deepClone(columnsCopy),
-        },
-        mark
-      );
-      this.$store.commit("setColumns", backData.columns);
-      this.$store.commit("setData", backData.data);
+      let backData = columnsIntoObj(copyData, {
+        columnArr: this.columnArr,
+        columnName: this.columnName,
+      });
+      this.$store.commit("setPreviewData", backData);
       if (mark !== "view") {
         this.$store.commit("setColumnsCopy", backData.columns);
-        this.$store.commit("setCopyData", backData.data);
+        this.$store.commit("setCopyData", backData.tableData);
+        this.$store.commit("setData", backData.tableData);
+        this.$store.commit("setColumns", backData.columns);
         // this.$Notice.success({ title: "批量替换成功！" });
       }
     },

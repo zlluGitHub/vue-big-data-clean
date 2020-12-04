@@ -1,6 +1,10 @@
 <template>
-  <div class="zl-table-box" @click.stop="handleClearClick">
-    <table ref="table">
+  <div
+    class="zl-table-box"
+    @click.stop="handleClearClick"
+    :style="{ height: winHeight + 'px', overflow: 'auto' }"
+  >
+    <table border="0" cellspacing="0" cellpadding="0">
       <tr>
         <th
           v-for="(item, i) in columns"
@@ -9,6 +13,7 @@
             'column-header',
             'column-header-' + i === selectClass.header ? 'source' : null,
             item.state === 'source' ? 'select' : null,
+            !order ? 'preview' : null,
           ]"
           @click.stop="
             handleSelectColumnClick(
@@ -29,7 +34,7 @@
           'column-' + m === selectClass.column ? 'source' : null,
         ]"
       >
-        <th
+        <td
           v-for="(each, n) in columns"
           :key="n"
           :class="[
@@ -37,6 +42,7 @@
             'row-' + n === selectClass.row ? 'source' : null,
             each.state === 'source' ? 'select' : null,
             m + '-' + n,
+            !order ? 'preview' : null,
           ]"
         >
           <div
@@ -51,15 +57,14 @@
             @click.stop="handleSelectBlockClick(m, n, item[each.value])"
             v-html="item[each.value]"
           ></div>
-        </th>
+        </td>
       </tr>
     </table>
   </div>
 </template>
 
 <script>
-// import data from "../../data/data.json";
-// import { deepClone } from "../../utils/index.js";
+import { windowSize } from "../../utils";
 export default {
   name: "app",
   data() {
@@ -67,12 +72,14 @@ export default {
       selectClass: {},
       columns: [],
       tableData: [],
+      windowSize: {},
+      winHeight: windowSize().winH - 40,
     };
   },
-  props: ["data", "column"],
+  props: ["data", "column", "order"],
   watch: {
     data: {
-       deep:true,
+      deep: true,
       handler: function (data) {
         if (this.data && this.data.length) {
           this.tableData = data;
@@ -81,29 +88,29 @@ export default {
       immediate: true,
     },
     column: {
-      deep:true,
+      deep: true,
       handler: function (columnArr) {
         if (columnArr && columnArr.length) {
           this.handleClearClick();
-          this.columns = [
-            {
-              label: "#",
-              value: "order",
-            },
-            ...columnArr,
-          ];
+          if (!this.order) {
+            this.columns = [...columnArr];
+          } else {
+            this.columns = [
+              {
+                label: "#",
+                value: "order",
+              },
+              ...columnArr,
+            ];
+          }
         }
       },
       immediate: true,
     },
   },
   // mounted() {
-  //   // let data1 = data.data;
-  //   // this.tableData = data1.map((item, i) => {
-  //   //   item.projectName_copy = "23_" + i;
-  //   //   return item;
-  //   // });
-  //   // console.log(this.tableData);
+  //   // let windowSize = windowSize();
+  //   // this.winHeight = windowSize.winH;
   // },
   methods: {
     // 选中某一块
