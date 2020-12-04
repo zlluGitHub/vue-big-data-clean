@@ -82,14 +82,13 @@ export default {
     },
   },
 
-  created() {},
+  // created() {},
   mounted() {
     this.setSize();
     let data = contentData.data;
     // for (let index = 0; index < 1; index++) {
     //   data = [...data,...data];
     // }
-
     console.log(data.length);
     let columns = [];
     if (data.length) {
