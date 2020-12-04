@@ -32,14 +32,41 @@ const mutations = {
     state.stepDataArr.push(data);
   },
   setData(state, data) {
-    state.data = data;
+    state.data = deepClone(data);
   },
   setColumns(state, data) {
-    // console.log(data);
-    state.columns = deepClone(data);
+    if (data && data.length) {
+      let newData = data.map(item => {
+        if (item.value && item.label) {
+          return item
+        } else {
+          return {
+            label: item,
+            label: value
+          }
+        }
+      })
+      state.columns = deepClone(newData)
+    } else {
+      state.columns = []
+    }
   },
   setColumnsCopy(state, data) {
-    state.columnsCopy = data;
+    if (data && data.length) {
+      let newData = data.map(item => {
+        if (item.value && item.label) {
+          return item
+        } else {
+          return {
+            label: item,
+            label: value
+          }
+        }
+      })
+      state.columnsCopy = deepClone(newData)
+    } else {
+      state.columnsCopy = []
+    }
   },
   setPreviewData(state, data) {
     state.previewData = data;

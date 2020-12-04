@@ -10,7 +10,7 @@
             'column-header-' + i === selectClass.header
               ? 'source-header'
               : null,
-            item.state === 'source' ? 'select-header' : null,
+            item.zl_state === 'source' ? 'select-header' : null,
             !order ? 'preview' : null,
           ]"
           @click.stop="
@@ -21,7 +21,8 @@
             )
           "
         >
-          <div :style="{ width: item.width ? item.width + 'px' : '200px' }">
+          <!-- <div :style="{ width: item.width ? item.width + 'px' : '200px' }"> -->
+          <div>
             {{ item.label }}
           </div>
         </th>
@@ -32,7 +33,7 @@
         :class="[
           'column',
           'column-' + m === selectClass.column ? 'source' : null,
-          !item.isRow ? 'is-row' : null,
+          item.zl_isRow ? 'is-row' : null,
         ]"
       >
         <td
@@ -41,7 +42,7 @@
           :class="[
             'row',
             'row-' + n === selectClass.row ? 'source' : null,
-            each.state === 'source' ? 'select' : null,
+            each.zl_state === 'source' ? 'select' : null,
             m + '-' + n,
             !order ? 'preview' : null,
           ]"
@@ -53,15 +54,39 @@
           >
             {{ m + 1 }}
           </div>
-          <div
+          <!-- <Tooltip
             v-else
-            :style="{ width: each.width ? each.width + 'px' : '200px' }"
+            :transfer="false"
+            placement="top-start"
+            max-width="200"
+          >
+            <div slot="content" v-html="item[each.value]"></div> -->
+          <!-- :style="{ width: item.width ? item.width + 'px' : '200px' }" -->
+          <div
+            class="zl-text"
             @click.stop="handleSelectBlockClick(m, n, item[each.value])"
             v-html="item[each.value]"
           ></div>
+          <!-- </Tooltip> -->
         </td>
       </tr>
     </table>
+    <Modal
+      :title="`修改第 ${textData.rowIndex + 1} 行，第 ${
+        textData.columnIndex
+      } 列`"
+      v-model="isModal"
+      @on-ok="handleModalOk"
+      @on-cancel="handleModalCancel"
+      :closable="false"
+    >
+      <Input
+        v-model="textData.value"
+        type="textarea"
+        :rows="4"
+        placeholder="请输入内容..."
+      />
+    </Modal>
   </div>
 </template>
 
@@ -70,9 +95,15 @@ export default {
   name: "app",
   data() {
     return {
+      textData: {
+        value: "",
+        rowIndex: 0,
+        columnIndex: 0,
+      },
       selectClass: {},
       columns: [],
       tableData: [],
+      isModal: false,
     };
   },
   props: ["data", "column", "order"],
@@ -121,9 +152,24 @@ export default {
   //   // this.winHeight = windowSize.winH;
   // },
   methods: {
+    handleModalOk() {
+      let { data, columns } = this.$store.state.dataState;
+      data[this.textData.rowIndex][
+        columns[this.textData.columnIndex - 1].value
+      ] = this.textData.value;
+
+      // this.$saveData(columns, data);
+    },
+    handleModalCancel() {},
     // 选中某一块
-    handleSelectBlockClick(m, n, item) {
-      console.log(m, n, item);
+    handleSelectBlockClick(m, n, text) {
+      // console.log(m, n, text);
+      this.textData = {
+        value: text,
+        rowIndex: m,
+        columnIndex: n,
+      };
+      this.isModal = !this.isModal;
     },
     // 清除选择
     handleClearClick() {

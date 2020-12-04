@@ -65,26 +65,28 @@ export default {
           columnArr: this.columnArr,
           columnName: this.columnName,
         });
+        this.$store.commit("setPreviewData", { show: false });
+        this.$emit("on-button-click");
       } else {
         this.$store.commit("setColumns", columnsCopy);
         this.$store.commit("setData", deepClone(copyData));
         this.handleClearData();
       }
-      this.$store.commit("setPreviewData", { show: false });
-      this.$emit("on-button-click");
     },
     handleData(mark) {
       let { copyData, columnsCopy } = this.dataState;
-      let backData = columnsIntoObj(copyData, {
-        columnArr: this.columnArr,
-        columnName: this.columnName,
-      });
-      this.$store.commit("setPreviewData", backData);
-      if (mark !== "view") {
-        this.$store.commit("setColumnsCopy", backData.columns);
-        this.$store.commit("setCopyData", backData.tableData);
-        this.$store.commit("setData", backData.tableData);
-        this.$store.commit("setColumns", backData.columns);
+      let backData = columnsIntoObj(
+        copyData,
+        {
+          columnArr: this.columnArr,
+          columnName: this.columnName,
+        },
+        mark
+      );
+      if (mark === "view") {
+        this.$store.commit("setPreviewData", backData);
+      } else {
+        this.$saveData(backData.columns, backData.tableData);
         // this.$Notice.success({ title: "批量替换成功！" });
       }
     },

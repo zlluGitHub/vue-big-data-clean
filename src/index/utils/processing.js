@@ -1,3 +1,12 @@
+import Vue from 'vue';
+
+Vue.prototype.$saveData = function (columns, data) {
+    this.$store.commit("setData", data);
+    this.$store.commit("setColumns", columns);
+    this.$store.commit("setColumnsCopy", columns);
+    this.$store.commit("setCopyData", data);
+}
+
 // 批量替换指定元素
 export const replaceWord = (newData, option, mark) => {
     let { columnArr, characterArr } = option;
@@ -149,7 +158,7 @@ export const insertWordFun = (newData, option, mark) => {
     });
 };
 
-export const columnsIntoArray = (newData, option) => {
+export const columnsIntoArray = (newData, option, mark) => {
     let { columnArr, columnName } = option;
     let columnNamePar = "";
     let newTableData = newData.map((item, i) => {
@@ -160,19 +169,35 @@ export const columnsIntoArray = (newData, option) => {
                 columnNamePar = columnName ? columnName : key + '_copy';
             };
         });
-        itemObj[columnNamePar] = JSON.stringify(newArr);
-        return itemObj;
+
+        if (mark === "view") {
+            itemObj[columnNamePar] = JSON.stringify(newArr);
+            return itemObj;
+        } else {
+            item[columnNamePar] = JSON.stringify(newArr);
+            return item;
+        }
+
     });
 
-    return {
-        columns: [{
-            label: columnNamePar,
-            value: columnNamePar,
-        }], tableData: newTableData
+    let newColumns = [{
+        label: columnNamePar,
+        value: columnNamePar,
+    }];
+    if (mark !== "view") {
+        let columns = []
+        for (const key in newData[0]) {
+            columns.push({
+                label: key,
+                value: key,
+            })
+        }
+        newColumns = columns;
     }
+    return { columns: newColumns, tableData: newTableData }
 }
 
-export const columnsIntoObj = (newData, option) => {
+export const columnsIntoObj = (newData, option, mark) => {
     let { columnArr, columnName } = option;
     let columnNamePar = "";
     let newTableData = newData.map((item, i) => {
@@ -183,15 +208,29 @@ export const columnsIntoObj = (newData, option) => {
                 columnNamePar = columnName ? columnName : key + '_copy';
             };
         });
-        itemObj[columnNamePar] = JSON.stringify(newObj);
-        return itemObj;
+        if (mark === "view") {
+            itemObj[columnNamePar] = JSON.stringify(newObj);
+            return itemObj;
+        } else {
+            item[columnNamePar] = JSON.stringify(newObj);
+            return item;
+        }
     });
 
-    return {
-        columns: [{
-            label: columnNamePar,
-            value: columnNamePar,
-        }], tableData: newTableData
+    let newColumns = [{
+        label: columnNamePar,
+        value: columnNamePar,
+    }];
+    if (mark !== "view") {
+        let columns = []
+        for (const key in newData[0]) {
+            columns.push({
+                label: key,
+                value: key,
+            })
+        }
+        newColumns = columns;
     }
+    return { columns: newColumns, tableData: newTableData }
 
 }

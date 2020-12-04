@@ -121,7 +121,7 @@ export default {
 
         if (newV) {
           newData.forEach((item, m) => {
-            item.isRow = false;
+            item.zl_isRow = true;
           });
           let rowArr = [];
           if (newV.indexOf(",") > -1) {
@@ -148,11 +148,11 @@ export default {
           }
           // console.log(rowArr);
           rowArr.forEach((i, m) => {
-            newData[i - 1].isRow = true;
+            newData[i - 1].zl_isRow = false;
           });
         } else {
           newData.forEach((item, m) => {
-            item.isRow = true;
+            item.zl_isRow = false;
           });
         }
 

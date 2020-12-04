@@ -78,7 +78,6 @@ export default {
       this.$nextTick(() => {
         this.setSize(newVal);
       });
-
       this.previewData = newVal;
     },
   },
@@ -86,10 +85,12 @@ export default {
   created() {},
   mounted() {
     this.setSize();
-    let data = contentData.data.map((item) => {
-      item.isRow = true;
-      return item;
-    });
+    let data = contentData.data;
+    // for (let index = 0; index < 1; index++) {
+    //   data = [...data,...data];
+    // }
+
+    console.log(data.length);
     let columns = [];
     if (data.length) {
       for (const key in data[0]) {
@@ -99,10 +100,7 @@ export default {
         });
       }
     }
-    this.$store.commit("setData", data);
-    this.$store.commit("setColumns", columns);
-    this.$store.commit("setColumnsCopy", columns);
-    this.$store.commit("setCopyData", data);
+    this.$saveData(columns, data);
   },
   methods: {
     setSize(newVal) {

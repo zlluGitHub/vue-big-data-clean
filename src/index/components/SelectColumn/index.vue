@@ -108,9 +108,9 @@ export default {
           let newColumnsCopy = deepClone(columnsCopy);
           newColumnsCopy.forEach((item) => {
             if (newV.indexOf(item.value) > -1) {
-              item.state = "source";
+              item.zl_state = "source";
             } else {
-              item.state = "";
+              item.zl_state = "";
             }
           });
           this.$store.commit("setColumns", newColumnsCopy);

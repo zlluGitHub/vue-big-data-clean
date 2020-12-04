@@ -1,43 +1,20 @@
 <template>
-  <div
-    class="zl-table-box"
-    @click.stop="handleClearClick"
-  >
+  <div class="zl-table-box" @click.stop="handleClearClick">
     <table border="0" cellspacing="0" cellpadding="0">
       <tr>
         <th
           v-for="(item, i) in columns"
           :key="i"
-          :class="[
-           'column-header',
-            !order ? 'preview-header' : null,
-          ]"
+          :class="['column-header', 'preview-header']"
         >
           <div>
             {{ item.label }}
           </div>
         </th>
       </tr>
-      <tr
-        v-for="(item, m) in tableData"
-        :key="m"
-      >
-        <td
-          v-for="(each, n) in columns"
-          :key="n"
-          :class="[
-            'row',
-            !order ? 'preview' : null,
-          ]"
-        >
+      <tr v-for="(item, m) in tableData" :key="m">
+        <td v-for="(each, n) in columns" :key="n" :class="['row', 'preview']">
           <div
-            v-if="each.value == 'order'"
-            class="order"
-          >
-            {{ m + 1 }}
-          </div>
-          <div
-            v-else
             @click.stop="handleSelectBlockClick(m, n, item[each.value])"
             v-html="item[each.value]"
           ></div>
@@ -49,12 +26,11 @@
 
 <script>
 export default {
-  name: "app",
   data() {
     return {
       selectClass: {},
       columns: [],
-      tableData: []
+      tableData: [],
     };
   },
   props: ["data", "column"],
@@ -73,7 +49,7 @@ export default {
       handler: function (columnArr) {
         if (columnArr && columnArr.length) {
           this.handleClearClick();
-            this.columns = [...columnArr];
+          this.columns = [...columnArr];
         }
       },
       immediate: true,
