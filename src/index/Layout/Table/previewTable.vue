@@ -2,7 +2,6 @@
   <div
     class="zl-table-box"
     @click.stop="handleClearClick"
-    :style="{ height: winHeight + 'px', overflow: 'auto' }"
   >
     <table border="0" cellspacing="0" cellpadding="0">
       <tr>
@@ -10,45 +9,30 @@
           v-for="(item, i) in columns"
           :key="i"
           :class="[
-            'column-header',
-            'column-header-' + i === selectClass.header ? 'source' : null,
-            item.state === 'source' ? 'select' : null,
-            !order ? 'preview' : null,
+           'column-header',
+            !order ? 'preview-header' : null,
           ]"
-          @click.stop="
-            handleSelectColumnClick(
-              item.label,
-              'column-header-' + i,
-              'row-' + i
-            )
-          "
         >
-          {{ item.label }}
+          <div>
+            {{ item.label }}
+          </div>
         </th>
       </tr>
       <tr
         v-for="(item, m) in tableData"
         :key="m"
-        :class="[
-          'column',
-          'column-' + m === selectClass.column ? 'source' : null,
-        ]"
       >
         <td
           v-for="(each, n) in columns"
           :key="n"
           :class="[
             'row',
-            'row-' + n === selectClass.row ? 'source' : null,
-            each.state === 'source' ? 'select' : null,
-            m + '-' + n,
             !order ? 'preview' : null,
           ]"
         >
           <div
             v-if="each.value == 'order'"
             class="order"
-            @click.stop="handleSelectRowClick(m, 'column-' + m)"
           >
             {{ m + 1 }}
           </div>
@@ -64,19 +48,16 @@
 </template>
 
 <script>
-import { windowSize } from "../../utils";
 export default {
   name: "app",
   data() {
     return {
       selectClass: {},
       columns: [],
-      tableData: [],
-      windowSize: {},
-      winHeight: windowSize().winH - 40,
+      tableData: []
     };
   },
-  props: ["data", "column", "order"],
+  props: ["data", "column"],
   watch: {
     data: {
       deep: true,
@@ -92,26 +73,12 @@ export default {
       handler: function (columnArr) {
         if (columnArr && columnArr.length) {
           this.handleClearClick();
-          if (!this.order) {
             this.columns = [...columnArr];
-          } else {
-            this.columns = [
-              {
-                label: "#",
-                value: "order",
-              },
-              ...columnArr,
-            ];
-          }
         }
       },
       immediate: true,
     },
   },
-  // mounted() {
-  //   // let windowSize = windowSize();
-  //   // this.winHeight = windowSize.winH;
-  // },
   methods: {
     // 选中某一块
     handleSelectBlockClick(m, n, item) {

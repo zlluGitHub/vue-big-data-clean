@@ -11,6 +11,18 @@
         text-align: center;
         cursor: pointer;
     }
+
+    .preview-header {
+        background: #fdd835;
+    }
+    .source-header {
+        background: rgba(255, 153, 0, 1);
+    }
+    .select-header {
+        background: #1697fa;
+        color: #fff;
+    }
+
     .preview {
         background: #fffbdc;
     }
@@ -32,7 +44,7 @@
 
     table {
         text-align: left;
-        width: 100%;
+        // width: 100%;
         border-left: 1px solid rgba(36, 41, 46, 0.04);
         border-collapse: collapse;
         // border-collapse: collapse; //表格的边框合并，如果相邻，则共用一个边框。
@@ -45,26 +57,15 @@
                 border-right: 1px solid rgba(36, 41, 46, 0.04);
                 > div {
                     padding: 3px 6px;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    word-break: break-all;
                 }
             }
         }
-    }
-
-    &::-webkit-scrollbar {
-        width: 5px;
-        border-radius: 10px;
-        background-color: #e7e6eb;
-        cursor: pointer;
-    }
-    /* 滚动槽 */
-    &::-webkit-scrollbar-track {
-        border-radius: 10px;
-    }
-
-    /* 滚动条滑块 */
-    &::-webkit-scrollbar-thumb {
-        border-radius: 10px;
-        cursor: pointer;
-        background: #b4bccd;
+        .is-row {
+            display: none;
+        }
     }
 }

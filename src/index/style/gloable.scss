@@ -33,17 +33,17 @@ ol {
         padding-top: 20px;
         padding-bottom: 10px;
     }
-    .button-warp{
-      display: flex;
-      justify-content: flex-end;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin-bottom: 30px;
-      >button{
-          margin-right: 20px;
-      }
+    .button-warp {
+        display: flex;
+        justify-content: flex-end;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin-bottom: 30px;
+        > button {
+            margin-right: 20px;
+        }
     }
 }
 
@@ -71,12 +71,15 @@ ol {
     border-radius: 2px;
     margin: 0 1px;
 }
-/* 设置滚动条的样式 */
-.scrollbar::-webkit-scrollbar {
-    width: 5px !important;
-    background-color: transparent;
-}
 
+//   /* 设置滚动条的样式 */
+.scrollbar::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    border-radius: 10px;
+    background-color: #e7e6eb;
+    cursor: pointer;
+}
 /* 滚动槽 */
 .scrollbar::-webkit-scrollbar-track {
     border-radius: 10px;
@@ -86,9 +89,8 @@ ol {
 .scrollbar::-webkit-scrollbar-thumb {
     border-radius: 10px;
     cursor: pointer;
-    background: #e5ecf3;
+    background: #b4bccd;
 }
-
 .show-enter-active {
     transition: all 0.25s ease-in;
 }

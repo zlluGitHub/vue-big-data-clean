@@ -1,5 +1,9 @@
 import { deepClone } from "../utils/index"
 const state = {
+  filter: {
+    row: "",
+    column: []
+  },
   copyData: [],
   data: [],
 
@@ -8,12 +12,19 @@ const state = {
 
   stepDataArr: [],
 
-  previewData:{
-    columns:[],
-    tableData:[]
+  previewData: {
+    columns: [],
+    tableData: []
   }
 }
 const mutations = {
+  setFilterRowData(state, val) {
+    state.filter.row = val;
+  },
+  setFilterColumnData(state, val) {
+    state.filter.column = val;
+  },
+
   setCopyData(state, data) {
     state.copyData = deepClone(data);
   },
@@ -25,7 +36,7 @@ const mutations = {
   },
   setColumns(state, data) {
     // console.log(data);
-    state.columns = deepClone(data) ;
+    state.columns = deepClone(data);
   },
   setColumnsCopy(state, data) {
     state.columnsCopy = data;

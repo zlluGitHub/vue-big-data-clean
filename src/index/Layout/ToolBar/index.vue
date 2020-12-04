@@ -7,7 +7,7 @@
       </ul>
       <ul>
         <li>
-          <div @click.stop="handleMenuSwitch('repInsWord')">
+          <div @click="handleMenuSwitch('repInsWord')">
             <img src="../../assets/th.svg" />
             <img src="../../assets/xxjt.svg" class="arrow-icon" />
           </div>
@@ -22,7 +22,7 @@
           </ol>
         </li>
         <li>
-          <div @click.stop="handleMenuSwitch('arrAndObj')">
+          <div @click="handleMenuSwitch('arrAndObj')">
             <img src="../../assets/zkh.svg" />
             <img src="../../assets/xxjt.svg" class="arrow-icon" />
           </div>
@@ -37,18 +37,35 @@
           </ol>
         </li>
       </ul>
-      <!-- 遮罩层 -->
-      <div class="mask-box" v-if="menuType" @click.stop="handleMenuSwitch"></div>
     </div>
-    <div class="right">登录</div>
+    <div class="right">
+      <ul>
+        <li>
+          <div @click="handleMenuSwitch('filter-column')">
+            <img src="../../assets/fil.svg" />
+            <img src="../../assets/xxjt.svg" class="arrow-icon" />
+          </div>
+          <ol v-if="moduleConfig.arrAndObj && menuType === 'filter-column'">
+            <FilterColumn v-model="columnArr" />
+          </ol>
+        </li>
+      </ul>
+    </div>
+    <!-- 遮罩层 -->
+    <div
+      class="mask-box"
+      v-if="menuType"
+      @click="handleMenuSwitch(false)"
+    ></div>
   </div>
 </template>
 <script>
+import FilterColumn from "../../components/FilterColumn";
 export default {
   name: "toolbar",
-  // components: {
-  //   // Footer,
-  // },
+  components: {
+    FilterColumn,
+  },
   props: ["moduleConfig"],
   // watch: {
   //   moduleConfig: {
@@ -61,7 +78,24 @@ export default {
   data() {
     return {
       menuType: "",
+      columnArr: [],
     };
+  },
+  watch: {
+    columnArr: {
+      // deep: true,
+      handler: function (newV, oldV) {
+        this.$store.commit(
+          "setColumns",
+          newV.map((item) => {
+            return {
+              label: item,
+              value: item,
+            };
+          })
+        );
+      },
+    },
   },
   created() {},
   mounted() {
@@ -73,6 +107,7 @@ export default {
       this.$event.emit("menu-type", item);
     },
     handleMenuSwitch(type) {
+      // console.log(type);
       if (type) {
         this.menuType = type;
       } else {

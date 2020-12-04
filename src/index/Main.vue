@@ -5,15 +5,18 @@
         <ToolBar :moduleConfig="menuData" />
       </div>
       <div class="zl-table-content" ref="tableContent">
-        <div class="source" :style="sourceStyle">
-          <Table :data="tableData" :column="columnsData" :order="true" />
+        <div class="source scrollbar" :style="sourceStyle">
+          <IndexTable :data="tableData" :column="columnsData" :order="true" />
         </div>
         <div
-          class="preview"
+          class="preview scrollbar"
           :style="previewStyle"
           v-if="previewData.tableData && previewData.columns"
         >
-          <Table :data="previewData.tableData" :column="previewData.columns" />
+          <PreviewTable
+            :data="previewData.tableData"
+            :column="previewData.columns"
+          />
         </div>
         <!-- <Table :data="tableData" :column="columnsData" /> -->
       </div>
@@ -25,16 +28,18 @@
 </template>
 <script>
 import { moduleConfig } from "./config/index";
-// import { windowSize } from "./utils";
+import { windowSize } from "./utils";
 import contentData from "./data/data.json";
 import ToolBar from "./Layout/ToolBar/index";
-import Table from "./Layout/Table/index";
+import IndexTable from "./Layout/Table/indexTable";
+import PreviewTable from "./Layout/Table/previewTable";
 import Drawer from "./Layout/Drawer/index";
 export default {
   name: "zl-main",
   components: {
     ToolBar,
-    Table,
+    IndexTable,
+    PreviewTable,
     Drawer,
   },
   data() {
@@ -81,7 +86,10 @@ export default {
   created() {},
   mounted() {
     this.setSize();
-    let data = contentData.data;
+    let data = contentData.data.map((item) => {
+      item.isRow = true;
+      return item;
+    });
     let columns = [];
     if (data.length) {
       for (const key in data[0]) {
@@ -91,7 +99,6 @@ export default {
         });
       }
     }
-
     this.$store.commit("setData", data);
     this.$store.commit("setColumns", columns);
     this.$store.commit("setColumnsCopy", columns);
@@ -99,12 +106,18 @@ export default {
   },
   methods: {
     setSize(newVal) {
-      let tableContentWidth = this.$refs.tableContent.clientWidth + 13;
+      let tableContentWidth = this.$refs.tableContent.clientWidth;
       if (newVal && newVal.tableData) {
         tableContentWidth = tableContentWidth - 350;
       }
+      let tableContentHeight = windowSize().winH - 43;
       this.sourceStyle = {
         width: tableContentWidth + "px",
+        height: tableContentHeight + "px",
+      };
+      this.previewStyle = {
+        width: "350px",
+        height: tableContentHeight + "px",
       };
     },
   },
@@ -119,34 +132,10 @@ export default {
     .zl-table-content {
       display: flex;
       justify-content: space-between;
-      // .source,
-      // .preview {
-      //   height: 95vh;
-      //   overflow: auto;
-      //   /* 设置滚动条的样式 */
-      //   &::-webkit-scrollbar {
-      //     width: 5px;
-      //     border-radius: 10px;
-      //     background-color: #e7e6eb;
-      //     cursor: pointer;
-      //   }
-      //   /* 滚动槽 */
-      //   &::-webkit-scrollbar-track {
-      //     border-radius: 10px;
-      //   }
-
-      //   /* 滚动条滑块 */
-      //   &::-webkit-scrollbar-thumb {
-      //     border-radius: 10px;
-      //     cursor: pointer;
-      //     background: #b4bccd;
-      //   }
-      // }
-      // .source {
-      //   width: calc(100% - 350px);
-      // }
+      .source,
       .preview {
-        width: 350px;
+        // height: 95vh;
+        overflow: auto;
       }
     }
   }
