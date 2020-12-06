@@ -3,12 +3,30 @@
     <div class="title">{{ title }}</div>
     <div class="content">
       <ul>
-        <li>
-          <label> 有效率 </label>
-          <p><span>12213</span><span>100%</span></p>
-          <em :style="{ width: '80%' }"></em>
+        <li
+          v-for="(item, i) in contentArr"
+          :key="'q' + i"
+          @click="handleClick(item.key)"
+        >
+          <div class="tip">
+            <label>{{ item.key }}</label>
+
+            <p>
+              <span>{{
+                item.value ? item.value.valid + "/" + item.value.tatol : 0
+              }}</span
+              ><span
+                >{{ item.value ? parseInt(item.value.percentage) : 0 }}%</span
+              >
+            </p>
+          </div>
+          <div class="block">
+            <em
+              :style="{ width: (item.value ? item.value.percentage : 0) + '%' }"
+            ></em>
+          </div>
         </li>
-        <li>
+        <!--<li>
           <label> 无效率 </label>
           <p><span>12213</span><span>100%</span></p>
           <em :style="{ width: '50%' }"></em>
@@ -17,7 +35,7 @@
           <label> 缺失率 </label>
           <p><span>12213</span><span>100%</span></p>
           <em :style="{ width: '30%' }"></em>
-        </li>
+        </li> -->
       </ul>
     </div>
   </div>
@@ -26,14 +44,32 @@
 export default {
   data() {
     return {
-      // configure:{
-      // }
+      contentArr: [],
     };
   },
-  props: ["title"],
+  props: ["content", "title"],
+  watch: {
+    content: {
+      handler: function (data) {
+        let arr = [];
+        for (const key in data) {
+          arr.push({
+            key: key,
+            value: data[key],
+          });
+        }
+        this.contentArr = arr;
+      },
+      immediate: true,
+    },
+  },
   created() {},
   mounted() {},
-  methods: {},
+  methods: {
+    handleClick(key) {
+      this.$event.emit("columnName", key);
+    },
+  },
 };
 </script>
 
@@ -43,34 +79,52 @@ $borderRadius: 5px;
   .content {
     > ul {
       > li {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #fff;
-        border-radius: $borderRadius;
-        position: relative;
-        padding: 3px 10px;
-        line-height: 1.3;
-        margin: 3px 0;
-        label {
-          color: #fff;
-          z-index: 1;
-        }
-        p {
-          z-index: 1;
-          color: #aaa;
-          span {
-            margin-left: 10px;
+        margin: 8px 0;
+        .tip {
+          display: flex;
+          justify-content: space-between;
+          // align-items: center;
+          label {
+            color: #666;
+            font-size: 14px;
+          }
+          p {
+            color: #aaa;
+            font-family: Georgia;
+            span {
+              margin-left: 10px;
+              display: inline-block;
+              &:last-child {
+                width: 40px;
+                text-align: right;
+              }
+            }
           }
         }
-        > em {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 50%;
-          height: 100%;
+
+        // margin: 3px 0;
+
+        .block {
           border-radius: $borderRadius;
-          background: #21a9ac;
+          position: relative;
+          background: #eee;
+          padding: 6px 10px;
+          cursor: pointer;
+          &:hover {
+            em {
+              background: #21aaac85;
+            }
+          }
+          em {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            border-radius: $borderRadius;
+            background: #21a9ac;
+            transition: background 0.2s ease;
+          }
         }
       }
     }

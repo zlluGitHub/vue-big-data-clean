@@ -1,10 +1,10 @@
 <template>
   <div class="drawer-box">
     <div class="zl-warp">
-      <Quality title="数据质量" />
+      <Quality title="键值有效统计" :content="qualityStatistics" />
     </div>
     <div class="zl-warp">
-      <UniqueKey title="键值统计" />
+      <UniqueKey title="字段数据统计" :content="keyStatistics" />
     </div>
   </div>
 </template>
@@ -16,13 +16,28 @@ export default {
     Quality,
     UniqueKey,
   },
-  // props: ["title"],
-  data() {
-    return {
-      // configure:{
-      // }
-    };
+  // data() {
+  //   return {
+  //     content: {},
+  //   };
+  // },
+  computed: {
+    qualityStatistics() {
+      return this.$store.state.dataState.qualityStatistics;
+    },
+    keyStatistics() {
+      return this.$store.state.dataState.keyStatistics;
+    },
   },
+  // watch: {
+  //   dataStatistics: {
+  //     handler: function (data) {
+  //       this.content = data;
+  //     },
+  //     immediate: true,
+  //   },
+  // },
+
   created() {},
   mounted() {},
   methods: {},

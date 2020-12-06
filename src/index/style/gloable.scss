@@ -38,7 +38,7 @@ ol {
         justify-content: flex-end;
         position: absolute;
         bottom: 0;
-        left: 0;
+        // left: 0;
         right: 0;
         margin-bottom: 30px;
         > button {
@@ -83,6 +83,7 @@ ol {
 /* 滚动槽 */
 .scrollbar::-webkit-scrollbar-track {
     border-radius: 10px;
+    // border-left: 1px solid #eee;
 }
 
 /* 滚动条滑块 */

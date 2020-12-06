@@ -7,6 +7,56 @@ Vue.prototype.$saveData = function (columns, data) {
     this.$store.commit("setCopyData", data);
 }
 
+// 数据质量统计
+export const dataQualityStatistics = (jsonData) => {
+    const repeatTime = (arr) => {
+        let object = arr.reduce(function (prev, next) {
+            prev[next] = (prev[next] + 1) || 1;
+            return prev;
+        }, {});
+        let newArr = [];
+        for (let key in object) {
+            newArr.push({
+                type: key,
+                count: object[key],
+                tatol:jsonData.length,
+                percentage: object[key] / jsonData.length * 100
+            })
+        };
+        return newArr
+    }
+    let keyArr = [];
+    for (const key in jsonData[0]) {
+        keyArr.push(key);
+    }
+    // console.log(keyArr);
+
+    let newObj = {}
+    let frequencyObj = {}
+    keyArr.forEach(key => {
+        let valid = 0
+        let timeArr = []
+        jsonData.forEach(each => {
+            timeArr.push(each[key])
+            if (each[key] || each[key] === 0) {
+                valid = valid + 1
+            }
+        });
+        newObj[key] = {
+            valid,
+            tatol: jsonData.length,
+            percentage: valid / jsonData.length * 100
+        }
+        frequencyObj[key] = repeatTime(timeArr);
+
+    });
+    console.log(newObj);
+    return {
+        whole: newObj,// 元素缺失率
+        frequency: frequencyObj// 统计数组中元素的重复次数
+    }
+}
+
 // 批量替换指定元素
 export const replaceWord = (newData, option, mark) => {
     let { columnArr, characterArr } = option;

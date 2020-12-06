@@ -1,10 +1,10 @@
 <template>
   <div class="zl-tool-bar">
     <div class="left">
-      <ul>
+      <!-- <ul>
         <li><img src="../../assets/1.svg" /></li>
         <li><img src="../../assets/2.svg" /></li>
-      </ul>
+      </ul> -->
       <ul>
         <li>
           <div @click="handleMenuSwitch('repInsWord')">

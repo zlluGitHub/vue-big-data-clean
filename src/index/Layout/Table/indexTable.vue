@@ -174,11 +174,15 @@ export default {
     // 清除选择
     handleClearClick() {
       this.selectClass = {};
+      this.$event.emit("columnName");
     },
     //选中列
     handleSelectColumnClick(columnName, header, row) {
       this.selectClass = { header, row };
       this.selectClass = { ...this.selectClass };
+      this.$event.emit("is-open-drawer", true);
+      this.$event.emit("columnName", columnName);
+
       console.log(columnName);
     },
     //选中行

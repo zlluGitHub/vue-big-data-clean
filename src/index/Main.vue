@@ -1,10 +1,10 @@
 <template>
   <div class="main">
-    <div class="left">
+    <div class="left" ref="leftWarp" :style="{ width: leftWarpWidth + 'px' }">
       <div class="zl-toolbar-container">
-        <ToolBar :moduleConfig="menuData" />
+        <ToolBarTop :moduleConfig="menuData" />
       </div>
-      <div class="zl-table-content" ref="tableContent">
+      <div class="zl-table-content">
         <div class="source scrollbar" :style="sourceStyle">
           <IndexTable :data="tableData" :column="columnsData" :order="true" />
         </div>
@@ -20,36 +20,50 @@
         </div>
         <!-- <Table :data="tableData" :column="columnsData" /> -->
       </div>
+      <div class="zl-toolbar-bottom">
+        <ToolBarBottom :toolBar="footerInfo" />
+      </div>
     </div>
-    <div class="right">
-      <Drawer :info="menuData.infoTatistics" />
+    <div class="right" v-if="isOpenDrawer">
+      <Drawer
+        :info="menuData.infoTatistics"
+        @on-click="handleOnClick"
+        :height="height"
+      />
     </div>
   </div>
 </template>
 <script>
+import contentData from "./data/data.json";
+
+import { dataQualityStatistics } from "./utils/processing";
 import { moduleConfig } from "./config/index";
 import { windowSize } from "./utils";
-import contentData from "./data/data.json";
-import ToolBar from "./Layout/ToolBar/index";
+import ToolBarTop from "./Layout/ToolBar/top";
+import ToolBarBottom from "./Layout/ToolBar/bottom";
 import IndexTable from "./Layout/Table/indexTable";
 import PreviewTable from "./Layout/Table/previewTable";
 import Drawer from "./Layout/Drawer/index";
 export default {
   name: "zl-main",
   components: {
-    ToolBar,
+    ToolBarTop,
+    ToolBarBottom,
     IndexTable,
     PreviewTable,
     Drawer,
   },
   data() {
     return {
+      isOpenDrawer: true,
       menuData: moduleConfig,
       tableData: [],
       columnsData: [],
       previewData: {},
       sourceStyle: {},
       previewStyle: {},
+      height: 600,
+      leftWarpWidth: 0,
     };
   },
 
@@ -62,6 +76,9 @@ export default {
     },
     preview() {
       return this.$store.state.dataState.previewData;
+    },
+    footerInfo() {
+      return this.$store.state.dataState.footerInfo;
     },
   },
   watch: {
@@ -82,38 +99,58 @@ export default {
     },
   },
 
-  // created() {},
+  created() {
+    this.$store.dispatch("reqQualityStatistics");
+    this.$store.dispatch("reqGetData", { pageNo: 1, pageSize: 200 });
+    this.$event.on("is-open-drawer", (state) => {
+      this.isOpenDrawer = state;
+    });
+  },
   mounted() {
     this.setSize();
-    let data = contentData.data;
-    // for (let index = 0; index < 1; index++) {
-    //   data = [...data,...data];
+    window.onresize = () => {
+      this.setSize();
+    };
+
+    // let data = contentData.data;
+
+    // let columns = [];
+    // if (data.length) {
+    //   for (const key in data[0]) {
+    //     columns.push({
+    //       label: key,
+    //       value: key,
+    //     });
+    //   }
     // }
-    console.log(data.length);
-    let columns = [];
-    if (data.length) {
-      for (const key in data[0]) {
-        columns.push({
-          label: key,
-          value: key,
-        });
-      }
-    }
-    this.$saveData(columns, data);
+
+    // this.toolBar = {
+    //   column: columns.length,
+    //   row: data.length,
+    // };
+    // this.$saveData(columns, data);
+
+    // this.$store.commit("setDataQualityStatistics", dataQualityStatistics(data));
   },
   methods: {
+    handleOnClick(state) {
+      this.isOpenDrawer = state;
+    },
     setSize(newVal) {
-      let tableContentWidth = this.$refs.tableContent.clientWidth;
-      if (newVal && newVal.tableData) {
-        tableContentWidth = tableContentWidth - 350;
+      // let tableContentWidth = this.$refs.tableContent.clientWidth;
+
+      if (this.isOpenDrawer) {
+        this.leftWarpWidth = this.$refs.leftWarp.clientWidth - 450;
+      } else {
+        this.leftWarpWidth = this.$refs.leftWarp.clientWidth;
       }
-      let tableContentHeight = windowSize().winH - 43;
+
+      let tableContentHeight = windowSize().winH - 44 * 2;
+      this.height = tableContentHeight;
       this.sourceStyle = {
-        width: tableContentWidth + "px",
         height: tableContentHeight + "px",
       };
       this.previewStyle = {
-        width: "350px",
         height: tableContentHeight + "px",
       };
     },
@@ -125,24 +162,33 @@ export default {
 .main {
   display: flex;
   .left {
-    width: 75%;
+    position: relative;
+    width: 100%;
+    flex: 1;
     .zl-table-content {
       display: flex;
+      width: 100%;
       justify-content: space-between;
       .source,
       .preview {
-        // height: 95vh;
         overflow: auto;
       }
+      .source {
+        width: 100%;
+        flex: 1;
+      }
+      // .preview {
+
+      // }
+    }
+    .zl-toolbar-bottom {
+      position: absolute;
+      // bottom: -44;
+      width: 100%;
     }
   }
   .right {
-    width: 25%;
-    // width: 500px;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
+    width: 450px;
     border-left: 1px solid #eee;
     // background: #eee;
   }

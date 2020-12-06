@@ -92,6 +92,10 @@ export default {
       if (mark === "ok") {
         // 缓存数据
         this.handleData(this.characterArr);
+        this.$store.dispatch("reqUpdate", {
+          columns: this.columnArr,
+          replace: this.characterArr,
+        });
         this.$store.commit("setStepDataArr", {
           module: this.moduleObj,
           columnArr: this.columnArr,

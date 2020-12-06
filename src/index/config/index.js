@@ -13,22 +13,22 @@ export const moduleConfig = {
             title: "将列嵌套到对象中",
             type: "columns-into-object",
         },
-        {
-            title: "将元素嵌套到列中",
-            type: "columns-into-object",
-        },
-        {
-            title: "将元素转化成对象",
-            type: "columns-into-object",
-        },
-        {
-            title: "将匹配值提取到数组",
-            type: "columns-into-object",
-        },
-        {
-            title: "将匹配值提取到对象",
-            type: "columns-into-object",
-        },
+        // {
+        //     title: "将元素嵌套到列中",
+        //     type: "columns-into-object",
+        // },
+        // {
+        //     title: "将元素转化成对象",
+        //     type: "columns-into-object",
+        // },
+        // {
+        //     title: "将匹配值提取到数组",
+        //     type: "columns-into-object",
+        // },
+        // {
+        //     title: "将匹配值提取到对象",
+        //     type: "columns-into-object",
+        // },
     ],
     repInsWord: [
         {

@@ -3,55 +3,20 @@
     <div class="title">{{ title }}</div>
     <div class="content">
       <div class="input-box">
-        <input type="text" />
+        <input type="text" v-model="inputValue" />
         <img src="../../../assets/search.svg" />
       </div>
-      <ul class="scrollbar">
-        <li>
-          <label> 有效率 </label>
-          <span>100%</span>
-          <em :style="{ width: '80%' }"></em>
+      <ul class="scrollbar" v-if="contentArr.length">
+        <li v-for="(item, i) in contentArr" :key="'q' + i">
+          <label> {{ item.type }} </label>
+          <span>{{ item.percentage ? item.percentage.toFixed(2) : 0 }}%</span>
+          <em
+            :style="{ width: (item.percentage ? item.percentage : 0) + '%' }"
+          ></em>
         </li>
-        <li>
-          <label> 无效率 </label>
-          <span>100%</span>
-          <em :style="{ width: '50%' }"></em>
-        </li>
-        <li>
-          <label> 缺失率 </label>
-          <span>100%</span>
-          <em :style="{ width: '30%' }"></em>
-        </li>
-        <li>
-          <label> 缺失率 </label>
-          <span>100%</span>
-          <em :style="{ width: '30%' }"></em>
-        </li>
-        <li>
-          <label> 缺失率 </label>
-          <span>100%</span>
-          <em :style="{ width: '30%' }"></em>
-        </li>
-        <li>
-          <label> 缺失率 </label>
-          <span>100%</span>
-          <em :style="{ width: '30%' }"></em>
-        </li>
-        <li>
-          <label> 缺失率 </label>
-          <span>100%</span>
-          <em :style="{ width: '30%' }"></em>
-        </li>
-        <li>
-          <label> 缺失率 </label>
-          <span>100%</span>
-          <em :style="{ width: '30%' }"></em>
-        </li>
-        <li>
-          <label> 缺失率 </label>
-          <span>100%</span>
-          <em :style="{ width: '30%' }"></em>
-        </li>
+      </ul>
+      <ul v-else class="scrollbar">
+        <div>请选择有效字段</div>
       </ul>
     </div>
   </div>
@@ -60,12 +25,41 @@
 export default {
   data() {
     return {
-      // configure:{
-      // }
+      contentArr: [],
+      inputValue: "",
+      key: "",
     };
   },
-  props: ["title"],
-  created() {},
+  props: ["content", "title"],
+  watch: {
+    inputValue(val) {
+      if (val) {
+        this.contentArr = this.content[this.key].filter((item) => {
+          return item.type.indexOf(val) > -1;
+        });
+      } else {
+        this.contentArr = this.content[this.key];
+      }
+    },
+    content: {
+      handler: function (data) {
+        if (this.key) {
+          this.contentArr = data[this.key];
+        }
+      },
+      immediate: true,
+    },
+  },
+  created() {
+    this.$event.on("columnName", (key) => {
+      this.key = key;
+      if (this.key) {
+        this.contentArr = this.content[key];
+      } else {
+        this.$store.dispatch("reqKeyStatistics", this.key);
+      }
+    });
+  },
   mounted() {},
   methods: {},
 };
@@ -105,13 +99,18 @@ export default {
     }
     > ul {
       margin-top: 10px;
-      max-height: 100px;
+      max-height: 430px;
       overflow: auto;
+      > div {
+        padding: 20px 0;
+        text-align: center;
+        background: rgba(238, 238, 238, 0.589);
+      }
       > li {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: #fff;
+        background: rgba(238, 238, 238, 0.589);
         position: relative;
         padding: 3px 10px;
         height: 20px;
