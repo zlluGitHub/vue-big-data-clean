@@ -6,7 +6,7 @@
         <input type="text" v-model="inputValue" />
         <img src="../../../assets/search.svg" />
       </div>
-      <ul class="scrollbar" v-if="contentArr.length">
+      <ul class="scrollbar" v-if="contentArr && contentArr.length">
         <li v-for="(item, i) in contentArr" :key="'q' + i">
           <label> {{ item.type }} </label>
           <span>{{ item.percentage ? item.percentage.toFixed(2) : 0 }}%</span>
@@ -53,9 +53,11 @@ export default {
   created() {
     this.$event.on("columnName", (key) => {
       this.key = key;
+      // this.$store.dispatch("reqKeyStatistics", this.key);
       if (this.key) {
         this.contentArr = this.content[key];
-      } else {
+      }
+      else {
         this.$store.dispatch("reqKeyStatistics", this.key);
       }
     });

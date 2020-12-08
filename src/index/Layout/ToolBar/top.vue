@@ -104,10 +104,10 @@ export default {
   methods: {
     handleMenuClickItem(item) {
       this.menuType = "";
+      this.$event.emit("is-open-drawer", true);
       this.$event.emit("menu-type", item);
     },
     handleMenuSwitch(type) {
-      // console.log(type);
       if (type) {
         this.menuType = type;
       } else {

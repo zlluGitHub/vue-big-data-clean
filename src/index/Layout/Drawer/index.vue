@@ -108,7 +108,7 @@ export default {
     },
   },
   // created() {
-    
+
   // },
   mounted() {
     this.$event.on("menu-type", (item) => {

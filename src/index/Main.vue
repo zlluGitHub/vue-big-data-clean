@@ -5,8 +5,10 @@
         <ToolBarTop :moduleConfig="menuData" />
       </div>
       <div class="zl-table-content">
-        <div class="source scrollbar" :style="sourceStyle">
-          <IndexTable :data="tableData" :column="columnsData" :order="true" />
+        <div class="source scrollbar" :style="sourceStyle" ref="source">
+          <div ref="indexTable">
+            <IndexTable :data="tableData" :column="columnsData" :order="true" />
+          </div>
         </div>
         <div
           class="preview scrollbar"
@@ -19,12 +21,13 @@
           />
         </div>
         <!-- <Table :data="tableData" :column="columnsData" /> -->
+        <Loading v-if="loading.state" :text="loading.text" />
       </div>
       <div class="zl-toolbar-bottom">
         <ToolBarBottom :toolBar="footerInfo" />
       </div>
     </div>
-    <div class="right" v-if="isOpenDrawer">
+    <div class="right" v-show="isOpenDrawer">
       <Drawer
         :info="menuData.infoTatistics"
         @on-click="handleOnClick"
@@ -36,6 +39,7 @@
 <script>
 import contentData from "./data/data.json";
 
+import Loading from "./components/Loading";
 import { dataQualityStatistics } from "./utils/processing";
 import { moduleConfig } from "./config/index";
 import { windowSize } from "./utils";
@@ -52,9 +56,11 @@ export default {
     IndexTable,
     PreviewTable,
     Drawer,
+    Loading,
   },
   data() {
     return {
+      loading: {},
       isOpenDrawer: true,
       menuData: moduleConfig,
       tableData: [],
@@ -105,11 +111,40 @@ export default {
     this.$event.on("is-open-drawer", (state) => {
       this.isOpenDrawer = state;
     });
+    this.$event.on("loading", (state, text) => {
+      this.loading = { state, text: text ? text : "操作正在执行，请稍后..." };
+    });
   },
   mounted() {
     this.setSize();
     window.onresize = () => {
       this.setSize();
+    };
+
+    // 监听div滚动
+    let source = this.$refs.source;
+    let indexTable = this.$refs.indexTable;
+    let isLoading = true;
+    let pageNo = 1;
+    // 监听这个dom的scroll事件
+    source.onscroll = () => {
+      console.log(indexTable.offsetHeight);
+      console.log(source.scrollTop);
+      console.log(indexTable.offsetHeight - (source.scrollTop + this.height));
+      let residualHeight =
+        indexTable.offsetHeight - (source.scrollTop + this.height);
+      if (isLoading && residualHeight < 2000) {
+        isLoading = false;
+        // let { upId, downId } = this.$store.state.dataState.pageInfo;
+        this.$store.dispatch("reqGetData", {
+          pageNo: 1,
+          pageSize: 200 * pageNo,
+          callBack: () => {
+            pageNo = pageNo + 1;
+            isLoading = true;
+          },
+        });
+      }
     };
 
     // let data = contentData.data;
@@ -166,6 +201,7 @@ export default {
     width: 100%;
     flex: 1;
     .zl-table-content {
+      position: relative;
       display: flex;
       width: 100%;
       justify-content: space-between;
@@ -184,6 +220,7 @@ export default {
     .zl-toolbar-bottom {
       position: absolute;
       // bottom: -44;
+
       width: 100%;
     }
   }
@@ -191,6 +228,18 @@ export default {
     width: 450px;
     border-left: 1px solid #eee;
     // background: #eee;
+  }
+  /deep/ .ivu-spin {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    color: #515a6e;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.9);
   }
 }
 </style>

@@ -180,7 +180,8 @@ export default {
     handleSelectColumnClick(columnName, header, row) {
       this.selectClass = { header, row };
       this.selectClass = { ...this.selectClass };
-      this.$event.emit("is-open-drawer", true);
+      // this.$event.emit("is-open-drawer", true);
+      // this.$event.emit("menu-type", "data-tatistics");
       this.$event.emit("columnName", columnName);
 
       console.log(columnName);

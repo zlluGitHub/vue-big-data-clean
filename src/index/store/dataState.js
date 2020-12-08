@@ -1,7 +1,9 @@
 import { deepClone } from "../utils/index"
-import { reqGetData, reqQualityStatistics,reqKeyStatistics,reqUpdate } from "../api"
+import { reqGetData, reqQualityStatistics, reqKeyStatistics, reqUpdate } from "../api"
 const state = {
   pageInfo: {
+    pageSize: 200,
+    pageNo: 1,
     order: 0,
     upId: "",
     downId: "",
@@ -32,11 +34,12 @@ const state = {
 const mutations = {
   setPageInfo(state, obj) {
     state.pageInfo = {
+      pageNo: obj.pageNo ? obj.pageNo : state.pageInfo.pageNo,
+      pageSize: obj.pageSize ? obj.pageSize : state.pageInfo.pageSize,
       order: obj.order ? obj.order : state.pageInfo.order,
       upId: obj.upId ? obj.upId : state.pageInfo.upId,
       downId: obj.downId ? obj.downId : state.pageInfo.downId,
     };
-    console.log(state.pageInfo);
   },
   setFooterInfo(state, val) {
     state.footerInfo = val;
@@ -102,9 +105,9 @@ const mutations = {
   },
 }
 const actions = {
-  reqGetData({ commit, state }, params) {
-    console.log(params);
-    reqGetData(params).then((res) => {
+  reqGetData({ commit, state }, { pageSize, pageNo, page_id, _id, bid ,callBack}) {
+    // console.log(params);
+    reqGetData({ pageSize, pageNo, page_id, _id, bid }).then((res) => {
       if (res.data.code === 200 || res.data.code === "200") {
         // console.log(res.data);
         let data = res.data.data
@@ -131,8 +134,10 @@ const actions = {
       } else {
         console.log(res);
       }
+      callBack(res.data)
     }).catch(error => {
       console.log(error);
+      // callBack(error)
     });
   },
   reqQualityStatistics({ commit, state }, params) {
@@ -157,14 +162,16 @@ const actions = {
       console.log(error);
     });
   },
-  reqUpdate({ commit, state }, params) {
+  reqUpdate({ commit, state, dispatch }, { params, callBack }) {
     reqUpdate(params).then((res) => {
-      if (res.data.code === 200 || res.data.code === "200") {
-        console.log(res);
-      } else {
-        console.log(res);
-      }
+      callBack(res.data);
+      // let pageInfo = state.pageInfo
+      // dispatch("reqGetData", {
+      //   page_id: pageInfo.upId,
+      //   pageSize: pageInfo.pageSize
+      // });
     }).catch(error => {
+      callBack(res)
       console.log(error);
     });
   }

@@ -91,11 +91,19 @@ export default {
     handleOKOrCancel(mark) {
       if (mark === "ok") {
         // 缓存数据
-        this.handleData(this.characterArr);
+        // this.handleData(this.characterArr);
+        this.$event.emit("loading", true);
         this.$store.dispatch("reqUpdate", {
-          columns: this.columnArr,
-          replace: this.characterArr,
+          params: {
+            columns: this.columnArr,
+            replace: this.characterArr,
+          },
+          callBack: (res) => {
+            this.handleData(this.characterArr);
+            this.$event.emit("loading", false);
+          },
         });
+
         this.$store.commit("setStepDataArr", {
           module: this.moduleObj,
           columnArr: this.columnArr,
@@ -120,10 +128,10 @@ export default {
         mark
       );
       this.$store.commit("setData", newData);
-      if (mark !== "view") {
-        this.$store.commit("setCopyData", newData);
-        // this.$Notice.success({ title: "批量替换成功！" });
-      }
+      // if (mark !== "view") {
+      //   this.$store.commit("setCopyData", newData);
+      //   // this.$Notice.success({ title: "批量替换成功！" });
+      // }
     },
     handleCharacterArr(mark, index) {
       if (index) {
