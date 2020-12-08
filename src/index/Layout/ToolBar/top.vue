@@ -104,6 +104,7 @@ export default {
   methods: {
     handleMenuClickItem(item) {
       this.menuType = "";
+      this.$emit("on-clear-select");
       this.$event.emit("is-open-drawer", true);
       this.$event.emit("menu-type", item);
     },

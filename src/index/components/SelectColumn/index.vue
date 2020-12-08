@@ -96,13 +96,14 @@ export default {
       columnList: [],
     };
   },
-  model: {
-    event: "returnBack",
-  },
+  // model: {
+  //   event: "change",
+  // },
   watch: {
     columnArr: {
       // deep: true,
       handler: function (newV, oldV) {
+        console.log(newV);
         if (newV.length) {
           let { columnsCopy } = this.dataState;
           let newColumnsCopy = deepClone(columnsCopy);
@@ -114,46 +115,47 @@ export default {
             }
           });
           this.$store.commit("setColumns", newColumnsCopy);
-          this.$emit("returnBack", newV);
+          this.$emit("on-change", newV);
         }
       },
     },
     rangeValue: {
       deep: true,
       handler: function (newV, oldV) {
-        this.columnArr = this.handleColumnMatch(newV.start, newV.end);
+        if (newV) {
+          this.columnArr = this.handleColumnMatch(newV.start, newV.end);
+        }
       },
     },
     seniorValue: {
       deep: true,
       handler: function (newV, oldV) {
-        // console.log(newV);
-        let columnArr = [];
-        if (newV.indexOf(",") > -1) {
-          let split = newV.split(",");
-          split.forEach((item) => {
-            if (item.indexOf("~") > -1) {
-              let splitA = item.split("~");
-              // console.log(splitA);
-              columnArr = [
-                ...columnArr,
-                ...this.handleColumnMatch(splitA[0], splitA[1]),
-              ];
-            } else {
-              columnArr.push(item);
-            }
-          });
-          this.columnArr = Array.from(new Set(columnArr));
-        } else {
-          if (newV.indexOf("~") > -1) {
-            let splitA = newV.split("~");
-            this.columnArr = this.handleColumnMatch(splitA[0], splitA[1]);
+        if (newV) {
+          let columnArr = [];
+          if (newV.indexOf(",") > -1) {
+            let split = newV.split(",");
+            split.forEach((item) => {
+              if (item.indexOf("~") > -1) {
+                let splitA = item.split("~");
+                // console.log(splitA);
+                columnArr = [
+                  ...columnArr,
+                  ...this.handleColumnMatch(splitA[0], splitA[1]),
+                ];
+              } else {
+                columnArr.push(item);
+              }
+            });
+            this.columnArr = Array.from(new Set(columnArr));
           } else {
-            this.columnArr = [newV];
+            if (newV.indexOf("~") > -1) {
+              let splitA = newV.split("~");
+              this.columnArr = this.handleColumnMatch(splitA[0], splitA[1]);
+            } else {
+              this.columnArr = [newV];
+            }
           }
         }
-        // console.log(this.columnArr);
-        // this.columnArr = columnArr;
       },
     },
   },
@@ -164,8 +166,21 @@ export default {
   },
 
   methods: {
+    handleClear(mark) {
+      let { copyData, columnsCopy } = this.dataState;
+      this.$store.commit("setColumns", columnsCopy);
+      this.$store.commit("setData", deepClone(copyData));
+      if (!mark) {
+        this.columnType = "";
+      }
+      this.rangeValue = {
+        start: "",
+        end: "",
+      };
+      this.seniorValue = "";
+    },
     handleColumnType(val) {
-      this.columnArr = [];
+      this.handleClear(true);
       if (val === "all") {
         this.columnArr = this.dataState.columns.map((item) => {
           return item.value;

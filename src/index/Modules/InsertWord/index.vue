@@ -4,7 +4,10 @@
       <li>
         <div class="title">选择列（可多选）</div>
         <div class="content">
-          <SelectColumn v-model="columnArr" />
+          <SelectColumn
+            @on-change="handleOnChangeSelectColumn"
+            ref="selectColumn"
+          />
         </div>
       </li>
       <li>
@@ -116,7 +119,9 @@ export default {
     },
     insertWord: {
       handler: function (newV, oldV) {
-        this.handleData("view");
+        if (newV) {
+          this.handleData("view");
+        }
       },
     },
   },
@@ -126,9 +131,10 @@ export default {
     this.columnList = columns;
   },
   methods: {
-    handleClearData() {
-      this.columnArr = [];
+    handleOnChangeSelectColumn(arr) {
+      this.columnArr = arr;
     },
+
     handleOKOrCancel(mark) {
       if (mark === "ok") {
         // 缓存数据
@@ -141,17 +147,20 @@ export default {
           insertWordObj: this.insertWordObj,
         });
       } else {
-        let { copyData } = this.dataState;
-        this.$store.commit("setData", deepClone(copyData));
-        this.handleClearData();
+        this.$refs.selectColumn.handleClear();
+        // this.columnArr = [];
+        this.insertWord = "";
+        this.matchRules = "";
+        this.insertWordObj = {
+          front: null,
+          after: null,
+        };
       }
-      this.$emit("on-button-click");
     },
 
     handleData(mark) {
       let { copyData } = this.dataState;
       let newData = deepClone(copyData);
-
       newData = insertWordFun(
         newData,
         {

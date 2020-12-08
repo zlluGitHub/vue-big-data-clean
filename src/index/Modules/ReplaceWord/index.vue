@@ -4,7 +4,10 @@
       <li>
         <div class="title">选择列数据</div>
         <div class="content">
-          <SelectColumn v-model="columnArr" />
+          <SelectColumn
+            @on-change="handleOnChangeSelectColumn"
+            ref="selectColumn"
+          />
         </div>
       </li>
       <li>
@@ -84,14 +87,12 @@ export default {
     });
   },
   methods: {
-    handleClearData() {
-      this.columnArr = [];
-      this.characterArr = [{ source: "", target: "" }];
+    handleOnChangeSelectColumn(arr) {
+      this.columnArr = arr;
     },
+
     handleOKOrCancel(mark) {
       if (mark === "ok") {
-        // 缓存数据
-        // this.handleData(this.characterArr);
         this.$event.emit("loading", true);
         this.$store.dispatch("reqUpdate", {
           params: {
@@ -104,17 +105,17 @@ export default {
           },
         });
 
-        this.$store.commit("setStepDataArr", {
-          module: this.moduleObj,
-          columnArr: this.columnArr,
-          characterArr: this.characterArr,
-        });
+        // this.$store.commit("setStepDataArr", {
+        //   module: this.moduleObj,
+        //   columnArr: this.columnArr,
+        //   characterArr: this.characterArr,
+        // });
       } else {
-        let { copyData } = this.dataState;
-        this.$store.commit("setData", deepClone(copyData));
-        this.handleClearData();
+        this.$refs.selectColumn.handleClear();
+        this.columnArr = [];
+        this.characterArr = [{ source: "", target: "" }];
       }
-      this.$emit("on-button-click");
+      // this.$emit("on-button-click");
     },
     handleData(newV, mark) {
       let { copyData } = this.dataState;

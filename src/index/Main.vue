@@ -2,12 +2,20 @@
   <div class="main">
     <div class="left" ref="leftWarp" :style="{ width: leftWarpWidth + 'px' }">
       <div class="zl-toolbar-container">
-        <ToolBarTop :moduleConfig="menuData" />
+        <ToolBarTop
+          :moduleConfig="menuData"
+          @on-clear-select="$refs.indexTable.handleClearClick()"
+        />
       </div>
       <div class="zl-table-content">
         <div class="source scrollbar" :style="sourceStyle" ref="source">
-          <div ref="indexTable">
-            <IndexTable :data="tableData" :column="columnsData" :order="true" />
+          <div ref="indexTableWarp">
+            <IndexTable
+              :data="tableData"
+              :column="columnsData"
+              :order="true"
+              ref="indexTable"
+            />
           </div>
         </div>
         <div
@@ -30,7 +38,7 @@
     <div class="right" v-show="isOpenDrawer">
       <Drawer
         :info="menuData.infoTatistics"
-        @on-click="handleOnClick"
+        @on-close="onDrawerClose"
         :height="height"
       />
     </div>
@@ -61,7 +69,7 @@ export default {
   data() {
     return {
       loading: {},
-      isOpenDrawer: true,
+      isOpenDrawer: false,
       menuData: moduleConfig,
       tableData: [],
       columnsData: [],
@@ -89,15 +97,15 @@ export default {
   },
   watch: {
     data(newVal, oldVal) {
-      console.log(newVal);
+      console.log(newVal, "--data--");
       this.tableData = newVal;
     },
     column(newVal, oldVal) {
-      console.log(newVal);
+      console.log(newVal, "--column--");
       this.columnsData = newVal;
     },
     preview(newVal, oldVal) {
-      console.log(newVal);
+      console.log(newVal, "--previewData--");
       this.$nextTick(() => {
         this.setSize(newVal);
       });
@@ -108,12 +116,8 @@ export default {
   created() {
     this.$store.dispatch("reqQualityStatistics");
     this.$store.dispatch("reqGetData", { pageNo: 1, pageSize: 200 });
-    this.$event.on("is-open-drawer", (state) => {
-      this.isOpenDrawer = state;
-    });
-    this.$event.on("loading", (state, text) => {
-      this.loading = { state, text: text ? text : "操作正在执行，请稍后..." };
-    });
+    this.$event.on("is-open-drawer", this.onIsOpenDrawer);
+    this.$event.on("loading", this.onLoading);
   },
   mounted() {
     this.setSize();
@@ -123,16 +127,16 @@ export default {
 
     // 监听div滚动
     let source = this.$refs.source;
-    let indexTable = this.$refs.indexTable;
+    let indexTableWarp = this.$refs.indexTableWarp;
     let isLoading = true;
     let pageNo = 1;
     // 监听这个dom的scroll事件
     source.onscroll = () => {
-      console.log(indexTable.offsetHeight);
-      console.log(source.scrollTop);
-      console.log(indexTable.offsetHeight - (source.scrollTop + this.height));
+      // console.log(indexTableWarp.offsetHeight);
+      // console.log(source.scrollTop);
+      // console.log(indexTableWarp.offsetHeight - (source.scrollTop + this.height));
       let residualHeight =
-        indexTable.offsetHeight - (source.scrollTop + this.height);
+        indexTableWarp.offsetHeight - (source.scrollTop + this.height);
       if (isLoading && residualHeight < 2000) {
         isLoading = false;
         // let { upId, downId } = this.$store.state.dataState.pageInfo;
@@ -164,13 +168,27 @@ export default {
     //   row: data.length,
     // };
     // this.$saveData(columns, data);
-
     // this.$store.commit("setDataQualityStatistics", dataQualityStatistics(data));
   },
   methods: {
-    handleOnClick(state) {
+    onIsOpenDrawer(state) {
       this.isOpenDrawer = state;
     },
+    onDrawerClose() {
+      this.$store.commit("setColumns", this.$store.state.dataState.columnsCopy);
+      this.isOpenDrawer = false;
+      this.$store.commit("setPreviewData", []);
+      this.$event.emit("menu-type", {
+        type: "data-tatistics",
+      });
+      this.$refs.indexTable.handleClearClick();
+    },
+    onLoading(state, text) {
+      this.loading = { state, text: text ? text : "操作正在执行，请稍后..." };
+    },
+    // handleOnClick(state) {
+    //   this.isOpenDrawer = state;
+    // },
     setSize(newVal) {
       // let tableContentWidth = this.$refs.tableContent.clientWidth;
 
@@ -189,6 +207,10 @@ export default {
         height: tableContentHeight + "px",
       };
     },
+  },
+  beforeDestroy() {
+    this.$event.off("is-open-drawer", this.offIsOpenDrawer);
+    this.$event.off("loading", this.onLoading);
   },
 };
 </script>

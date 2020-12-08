@@ -174,22 +174,24 @@ export default {
     // 清除选择
     handleClearClick() {
       this.selectClass = {};
-      this.$event.emit("columnName");
+      // this.$event.emit("columnName");
     },
     //选中列
     handleSelectColumnClick(columnName, header, row) {
       this.selectClass = { header, row };
-      this.selectClass = { ...this.selectClass };
-      // this.$event.emit("is-open-drawer", true);
-      // this.$event.emit("menu-type", "data-tatistics");
+      // this.selectClass = { ...this.selectClass };
+      this.$event.emit("is-open-drawer", true);
+      this.$event.emit("menu-type", {
+        type: "data-tatistics",
+      });
       this.$event.emit("columnName", columnName);
 
-      console.log(columnName);
+      // console.log(columnName);
     },
     //选中行
     handleSelectRowClick(rowIndex, column) {
       this.selectClass = { column };
-      this.selectClass = { ...this.selectClass };
+      // this.selectClass = { ...this.selectClass };
       console.log(rowIndex);
     },
   },

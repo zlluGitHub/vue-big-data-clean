@@ -4,7 +4,10 @@
       <li>
         <div class="title">选择列数据</div>
         <div class="content">
-          <SelectColumn v-model="columnArr" />
+          <SelectColumn
+            @on-change="handleOnChangeSelectColumn"
+            ref="selectColumn"
+          />
         </div>
       </li>
       <li>
@@ -43,8 +46,9 @@ export default {
     columnName: {
       // deep: true,
       handler: function (newV, oldV) {
-        // console.log(newV);
-        this.handleData("view");
+        if (newV) {
+          this.handleData("view");
+        }
       },
     },
   },
@@ -52,6 +56,9 @@ export default {
   //   this.columnArr = this.dataState.columns;
   // },
   methods: {
+    handleOnChangeSelectColumn(arr) {
+      this.columnArr = arr;
+    },
     handleClearData() {
       this.columnArr = [];
     },
@@ -68,8 +75,10 @@ export default {
         this.$store.commit("setPreviewData", { show: false });
         this.$emit("on-button-click");
       } else {
-        this.$store.commit("setColumns", columnsCopy);
-        this.$store.commit("setData", copyData);
+        this.$refs.selectColumn.handleClear();
+        // this.columnArr = [];
+        this.columnName = "";
+        this.$store.commit("setPreviewData", []);
       }
     },
     handleData(mark) {

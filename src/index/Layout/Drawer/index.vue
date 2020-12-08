@@ -16,50 +16,36 @@
       class="zl-drawer-item"
       :style="style"
     >
-      <ReplaceWord
-        :moduleObj="moduleObj"
-        @on-button-click="handleOnButtonClick"
-      />
+      <!-- @on-button-click="handleOnButtonClick" -->
+      <ReplaceWord :moduleObj="moduleObj" />
     </div>
     <div
       v-else-if="moduleObj.type === 'delete-word'"
       class="zl-drawer-item"
       :style="style"
     >
-      <DeleteWord
-        :moduleObj="moduleObj"
-        @on-button-click="handleOnButtonClick"
-      />
+      <DeleteWord :moduleObj="moduleObj" />
     </div>
     <div
       v-else-if="moduleObj.type === 'insert-word'"
       class="zl-drawer-item"
       :style="style"
     >
-      <InsertWord
-        :moduleObj="moduleObj"
-        @on-button-click="handleOnButtonClick"
-      />
+      <InsertWord :moduleObj="moduleObj" />
     </div>
     <div
       v-else-if="moduleObj.type === 'columns-into-array'"
       class="zl-drawer-item"
       :style="style"
     >
-      <ColumnsIntoArray
-        :moduleObj="moduleObj"
-        @on-button-click="handleOnButtonClick"
-      />
+      <ColumnsIntoArray :moduleObj="moduleObj" />
     </div>
     <div
       v-else-if="moduleObj.type === 'columns-into-object'"
       class="zl-drawer-item"
       :style="style"
     >
-      <ColumnsIntoObj
-        :moduleObj="moduleObj"
-        @on-button-click="handleOnButtonClick"
-      />
+      <ColumnsIntoObj :moduleObj="moduleObj" />
     </div>
     <div v-else></div>
   </div>
@@ -90,14 +76,6 @@ export default {
   },
   props: ["info", "height"],
   watch: {
-    // data: {
-    //   handler: function (data) {
-    //     if (this.data && this.data.length) {
-    //       console.log(data);
-    //     }
-    //   },
-    //   immediate: true,
-    // },
     height: {
       handler: function (val) {
         this.style = {
@@ -111,18 +89,22 @@ export default {
 
   // },
   mounted() {
-    this.$event.on("menu-type", (item) => {
-      this.moduleObj = item;
-    });
+    this.$event.on("menu-type", this.onMenuType);
   },
   methods: {
+    onMenuType(item) {
+      this.moduleObj = item;
+    },
     handleClose() {
-      this.$emit("on-click", false);
+      this.$emit("on-close", false);
     },
-    handleOnButtonClick() {
-      console.log(this.info);
-      this.moduleObj = this.info;
-    },
+    // handleOnButtonClick() {
+    //   // console.log(this.info);
+    //   this.moduleObj = this.info;
+    // },
+  },
+  beforeDestroy() {
+    this.$event.off("menu-type", this.onMenuType);
   },
 };
 </script>

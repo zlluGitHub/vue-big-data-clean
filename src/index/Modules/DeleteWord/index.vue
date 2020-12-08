@@ -4,7 +4,10 @@
       <li>
         <div class="title">选择列（可多选）</div>
         <div class="content">
-          <SelectColumn v-model="columnArr" />
+          <SelectColumn
+            @on-change="handleOnChangeSelectColumn"
+            ref="selectColumn"
+          />
         </div>
       </li>
 
@@ -62,9 +65,11 @@ export default {
   },
 
   methods: {
+    handleOnChangeSelectColumn(arr) {
+      this.columnArr = arr;
+    },
     handleClearData() {
       this.columnArr = [];
-      this.characterArr = [""];
     },
     handleOKOrCancel(mark) {
       if (mark === "ok") {
@@ -76,11 +81,9 @@ export default {
           characterArr: this.characterArr,
         });
       } else {
-        let { copyData } = this.dataState;
-        this.$store.commit("setData", deepClone(copyData));
-        this.handleClearData();
+        this.$refs.selectColumn.handleClear();
+        this.characterArr = [""];
       }
-      this.$emit("on-button-click");
     },
     handleData(newV, mark) {
       let { copyData } = this.dataState;
