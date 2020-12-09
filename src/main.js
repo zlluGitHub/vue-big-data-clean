@@ -10,17 +10,14 @@ import ViewUI from 'view-design';
 import 'view-design/dist/styles/iview.css';
 Vue.use(ViewUI);
 
-// import TextHighlight from 'vue-text-highlight';
-// Vue.component('text-highlight', TextHighlight);
+// //引入axios
+// import axios from 'axios';
+// import qs from 'qs';
 
-//引入axios
-import axios from 'axios';
-import qs from 'qs';
-
-axios.defaults.baseURL = process.env.VUE_APP_URL;
-Vue.prototype.$url = process.env.VUE_APP_URL;
-Vue.prototype.$axios = axios    //全局注册，使用方法为:this.$axios
-Vue.prototype.$qs = qs           //全局注册，使用方法为:this.$qs
+// axios.defaults.baseURL = process.env.VUE_APP_URL;
+// Vue.prototype.$url = process.env.VUE_APP_URL;
+// Vue.prototype.$axios = axios    //全局注册，使用方法为:this.$axios
+// Vue.prototype.$qs = qs           //全局注册，使用方法为:this.$qs
 
 // import './utils/flexible' //rem 转换
 
