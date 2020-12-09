@@ -4,22 +4,16 @@
       <li>
         <div class="title">选择列（可多选）</div>
         <div class="content">
-          <SelectColumn
-            @on-change="handleOnChangeSelectColumn"
-            ref="selectColumn"
-          />
+          <SelectColumn @on-change="handleOnChangeSelectColumn" ref="selectColumn" />
         </div>
       </li>
 
       <li>
         <div class="title">需要删除的元素</div>
         <div class="content element-sub">
-          <div class="item" v-for="(item, i) in characterArr" :key="item">
+          <div class="item" v-for="(item, i) in characterArr" :key="'y' + i">
             <Input v-model="characterArr[i]" placeholder="批量删除元素..." />
-            <Icon
-              type="ios-add-circle-outline"
-              @click.stop="handleCharacterArr('add')"
-            />
+            <Icon type="ios-add-circle-outline" @click.stop="handleCharacterArr('add')" />
             <Icon
               v-if="characterArr && characterArr.length !== 1"
               type="ios-trash-outline"
@@ -37,6 +31,7 @@
 </template>
 <script>
 import { deepClone } from "../../utils";
+import { reqDelete } from "../../api";
 import SelectColumn from "../../components/SelectColumn/index";
 import { deleteWord } from "../../utils/processing";
 export default {
@@ -53,13 +48,17 @@ export default {
     characterArr: {
       deep: true,
       handler: function (newV, oldV) {
-        this.handleData(newV, "view");
+        if (newV && newV[0]) {
+          this.handleData(newV, "view");
+        }
       },
     },
     columnArr: {
       // deep: true,
       handler: function (newV, oldV) {
-        this.handleData(newV, "view");
+        if (newV && newV[0]) {
+          this.handleData(newV, "view");
+        }
       },
     },
   },
@@ -68,21 +67,57 @@ export default {
     handleOnChangeSelectColumn(arr) {
       this.columnArr = arr;
     },
-    handleClearData() {
-      this.columnArr = [];
+    handleClear() {
+      this.$refs.selectColumn.handleClear();
+      this.characterArr = [""];
     },
     handleOKOrCancel(mark) {
       if (mark === "ok") {
-        // 缓存数据
-        this.handleData(this.characterArr);
-        this.$store.commit("setStepDataArr", {
-          module: this.moduleObj,
-          columnArr: this.columnArr,
-          characterArr: this.characterArr,
-        });
+        if (this.columnArr.length) {
+          this.$event.emit("loading", true);
+          reqDelete({
+            type: "word",
+            content: {
+              columns: this.columnArr,
+              word: this.characterArr,
+            },
+          })
+            .then((res) => {
+              this.$event.emit("loading", false);
+              if (res.data.code === 200) {
+                this.handleData(this.characterArr);
+                this.handleClear();
+                this.$Modal.success({
+                  title: "系统提示",
+                  content: `总共：${res.data.tatol}条，成功：${res.data.success}条，失败：${res.data.error}条`,
+                });
+              } else {
+                this.$Notice.error({
+                  title: "操作失败！",
+                });
+              }
+            })
+            .catch((error) => {
+              this.$event.emit("loading", false);
+              this.$Notice.error({
+                title: "网络异常，请稍后再试！",
+              });
+              console.log(error);
+            });
+        } else {
+          this.$Notice.warning({
+            title: "请输入相关内容后操作！",
+          });
+        }
+        // this.$store.commit("setStepDataArr", {
+        //   module: this.moduleObj,
+        //   columnArr: this.columnArr,
+        //   characterArr: this.characterArr,
+        // });
       } else {
-        this.$refs.selectColumn.handleClear();
-        this.characterArr = [""];
+        if (this.columnArr.length) {
+          this.handleClear();
+        }
       }
     },
     handleData(newV, mark) {

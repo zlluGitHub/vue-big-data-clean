@@ -174,57 +174,192 @@ router.get('/get/keyStatistics', (req, res, next) => {
 
 })
 
-// 批量修改数据
+// 修改替换数据
 router.post('/get/update', (req, res, next) => {
-    let { columns, replace } = req.body;
-    let filterArr = [];
-    if (columns && replace) {
-        columns.forEach(key => {
-            let filterObj = {}, regExp = "";
-            replace.forEach(obj => {
-                regExp = '|' + obj.source + regExp
-            })
-            regExp = regExp.slice(1, regExp.length);
-            filterObj[key] = { $regex: new RegExp(`${regExp}`, 'gi') }
-            filterArr.push(filterObj)
+    let { type, content } = req.body;
+
+    if (type === 'one') {
+        let { _id, key, value } = content;
+        let obj = {};
+        obj[key] = value;
+        dataBase.updateOne({ _id }, { $set: obj }, (err, data) => {
+            if (err) {
+                console.log(err);
+                res.json({ result: false, code: 500, mas: "未找到匹配项！" });
+            } else {
+                res.json({ result: true, code: 200, mas: "更新成功！" });
+            }
         });
-        if (filterArr.length !== 0) {
-            let promise = new Promise((resolve, reject) => {
-                dataBase.find({ $or: filterArr }, (err, data) => {
-                    if (err) {
-                        reject(err)
-                    } else {
-                        resolve(JSON.parse(JSON.stringify(data)))
-                    }
+    } else if (type === 'more') {
+        let { columns, replace } = content;
+        // console.log(columns, replace);
+        let filterArr = [];
+        if (columns && replace) {
+            columns.forEach(key => {
+                let filterObj = {}, regExp = "";
+                replace.forEach(obj => {
+                    regExp = '|' + obj.source + regExp
                 })
+                regExp = regExp.slice(1, regExp.length);
+                filterObj[key] = { $regex: new RegExp(`${regExp}`, 'gi') }
+                filterArr.push(filterObj)
             });
-            promise.then(dataArr => {
-                dataArr.forEach(item => {
-                    let obj = {}
-                    columns.forEach(key => {
-                        obj[key] = item[key]
-                        replace.forEach(repObj => {
-                            obj[key] = obj[key].replace(new RegExp(repObj.source, 'g'), repObj.target)
-                        });
-                    })
-                    dataBase.updateOne({ _id: item._id }, { $set: obj }, (err, data) => {
+            if (filterArr.length !== 0) {
+                let promise = new Promise((resolve, reject) => {
+                    dataBase.find({ $or: filterArr }, (err, data) => {
                         if (err) {
-                            console.log(err);
+                            reject(err)
                         } else {
-                            // console.log("更新成功!");
+                            resolve(JSON.parse(JSON.stringify(data)))
+                        }
+                    })
+                });
+                promise.then(dataArr => {
+                    // console.log(dataArr);
+                    let countObj = {
+                        tatol: 0, success: 0, error: 0
+                    };
+                    if (dataArr.length) {
+                        dataArr.forEach(item => {
+                            let obj = {}
+                            columns.forEach(key => {
+                                obj[key] = item[key]
+                                replace.forEach(repObj => {
+                                    obj[key] = obj[key].replace(new RegExp(repObj.source, 'gi'), repObj.target)
+                                });
+                            })
+                            dataBase.updateMany({ _id: item._id }, { $set: obj }, (err, data) => {
+                                if (err) {
+                                    countObj.tatol = countObj.tatol + 1;
+                                    countObj.error = countObj.error + 1;
+                                    if (countObj.tatol === dataArr.length) {
+                                        callBack(dataArr.length, countObj.success, countObj.error)
+                                    }
+
+                                } else {
+                                    countObj.tatol = countObj.tatol + 1;
+                                    countObj.success = countObj.success + 1;
+                                    if (countObj.tatol === dataArr.length) {
+                                        callBack(dataArr.length, countObj.success, countObj.error)
+                                    };
+                                }
+                            });
+
+                        });
+                    } else {
+                        callBack(0, 0, 0);
+                    }
+
+                    function callBack(tatol, success, error) {
+                        if (countObj.tatol === countObj.success) {
+                            res.json({ tatol, success, error, result: true, code: 200 });
+                        } else {
+                            res.json({ tatol, success, error, result: false, code: 500 });
+                        }
+
+                    }
+                }, err => {
+                    console.log('错误信息：', err);
+                    res.json({ result: false, code: 500 });
+                })
+            } else {
+                res.json({ result: false, code: 500, mas: "未找到匹配项！" });
+            }
+        } else {
+            res.json({ result: false, code: 500, mas: "暂未选择任何替换参数！" });
+        }
+    }
+})
+
+// 修改删除数据
+router.post('/get/delete', (req, res, next) => {
+    let { type, content } = req.body;
+
+    if (type === 'columns') {
+        // let { _id, key, value } = content;
+        // let obj = {};
+        // obj[key] = value;
+        // dataBase.updateOne({ _id }, { $set: obj }, (err, data) => {
+        //     if (err) {
+        //         console.log(err);
+        //         res.json({ result: false, code: 500, mas: "未找到匹配项！" });
+        //     } else {
+        //         res.json({ result: true, code: 200, mas: "更新成功！" });
+        //     }
+        // });
+    } else if (type === 'word') {
+        let { columns, word } = content;
+        // console.log(columns, word);
+        let filterArr = [];
+        if (columns && word) {
+            columns.forEach(key => {
+                let filterObj = {}, regExp = "";
+                word.forEach(val => {
+                    regExp = '|' + val + regExp
+                })
+                regExp = regExp.slice(1, regExp.length);
+                filterObj[key] = { $regex: new RegExp(`${regExp}`, 'gi') }
+                filterArr.push(filterObj)
+            });
+            // console.log(filterArr);
+            if (filterArr.length !== 0) {
+                let promise = new Promise((resolve, reject) => {
+                    dataBase.find({ $or: filterArr }, (err, data) => {
+                        if (err) {
+                            reject(err)
+                        } else {
+                            resolve(JSON.parse(JSON.stringify(data)))
+                        }
+                    })
+                });
+                promise.then(dataArr => {
+                    let countObj = {
+                        tatol: 0, success: 0, error: 0
+                    };
+
+                    dataArr.forEach(item => {
+                        let obj = {}
+                        columns.forEach(key => {
+                            obj[key] = item[key]
+                            word.forEach(repObj => {
+                                obj[key] = obj[key].replace(new RegExp(repObj, 'gi'), "")
+                            });
+                        })
+                        dataBase.updateMany({ _id: item._id }, { $set: obj }, (err, data) => {
+                            if (err) {
+                                countObj.tatol = countObj.tatol + 1;
+                                countObj.error = countObj.error + 1;
+                                if (countObj.tatol === dataArr.length) {
+                                    callBack(dataArr.length, countObj.success, countObj.error)
+                                }
+
+                            } else {
+                                countObj.tatol = countObj.tatol + 1;
+                                countObj.success = countObj.success + 1;
+                                if (countObj.tatol === dataArr.length) {
+                                    callBack(dataArr.length, countObj.success, countObj.error)
+                                };
+                            }
+                        });
+                        function callBack(tatol, success, error) {
+                            if (countObj.tatol === countObj.success) {
+                                res.json({ tatol, success, error, result: true, code: 200 });
+                            } else {
+                                res.json({ tatol, success, error, result: false, code: 500 });
+                            }
+
                         }
                     });
+                }, err => {
+                    console.log('错误信息：', err);
+                    res.json({ result: false, code: 500 });
                 })
-                res.json({ update_count: dataArr.length, result: true, code: 200 });
-            }, err => {
-                console.log('错误信息：', err);
-                res.json({ result: false, code: 500 });
-            })
+            } else {
+                res.json({ result: false, code: 500, mas: "未找到匹配项！" });
+            }
         } else {
-            res.json({ result: false, code: 500, mas: "未找到匹配项！" });
+            res.json({ result: false, code: 500, mas: "暂未选择任何替换参数！" });
         }
-    } else {
-        res.json({ result: false, code: 500, mas: "暂未选择任何替换参数！" });
     }
 })
 

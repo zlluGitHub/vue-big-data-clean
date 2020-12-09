@@ -33,3 +33,12 @@ export function reqUpdate(data) {
         data
     })
 }
+
+// 删除字符内容
+export function reqDelete(data) {
+    return request({
+        url: '/dataClear/get/delete',
+        method: 'post',
+        data
+    })
+}

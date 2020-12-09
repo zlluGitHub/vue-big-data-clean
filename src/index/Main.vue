@@ -4,7 +4,7 @@
       <div class="zl-toolbar-container">
         <ToolBarTop
           :moduleConfig="menuData"
-          @on-clear-select="$refs.indexTable.handleClearClick()"
+          @on-clear-select="handleClearClick"
         />
       </div>
       <div class="zl-table-content">
@@ -173,6 +173,9 @@ export default {
   methods: {
     onIsOpenDrawer(state) {
       this.isOpenDrawer = state;
+    },
+    handleClearClick(state) {
+      this.$refs.indexTable.handleClearClick();
     },
     onDrawerClose() {
       this.$store.commit("setColumns", this.$store.state.dataState.columnsCopy);

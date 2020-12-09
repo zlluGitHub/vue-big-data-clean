@@ -19,7 +19,7 @@ export const dataQualityStatistics = (jsonData) => {
             newArr.push({
                 type: key,
                 count: object[key],
-                tatol:jsonData.length,
+                tatol: jsonData.length,
                 percentage: object[key] / jsonData.length * 100
             })
         };
@@ -67,29 +67,19 @@ export const replaceWord = (newData, option, mark) => {
                 characterArr.forEach((obj) => {
                     let { source, target } = obj;
                     let startIndex = text.indexOf(source);
-                    let endIndex = startIndex + source.length;
                     if (startIndex > -1) {
                         if (mark === "view") {
-                            text =
-                                text.slice(0, startIndex) +
-                                (source
-                                    ? `<span class="del-highlight">${source}</span>`
-                                    : "") +
-                                (target
-                                    ? `<span class="rep-highlight">${target}</span>`
-                                    : "") +
-                                text.slice(endIndex, text.length);
+                            text = text.replace(new RegExp(source, 'gi'), (source ? `<span class="del-highlight">${source}</span>` : '') + (target ? `<span class="rep-highlight">${target}</span>` : ''))
                         } else {
-                            text =
-                                text.slice(0, startIndex) +
-                                target +
-                                text.slice(endIndex, text.length);
+                            text = text.replace(new RegExp(source, 'gi'), target)
                         }
                     }
+
                     item[key] = text;
                 });
             }
         });
+      
         return item;
     });
 };
@@ -102,17 +92,11 @@ export const deleteWord = (newData, option, mark) => {
             if (text) {
                 characterArr.forEach((val) => {
                     let startIndex = text.indexOf(val);
-                    let endIndex = startIndex + val.length;
                     if (startIndex > -1) {
                         if (mark === "view") {
-                            text =
-                                text.slice(0, startIndex) +
-                                (val ? `<span class="del-highlight">${val}</span>` : "") +
-                                text.slice(endIndex, text.length);
+                            text = text.replace(new RegExp(val, 'gi'), val ? `<span class="del-highlight">${val}</span>` : '');
                         } else {
-                            text =
-                                text.slice(0, startIndex) +
-                                text.slice(endIndex, text.length);
+                            text = text.replace(new RegExp(val, 'gi'), '');
                         }
                     }
                     item[key] = text;
@@ -146,7 +130,6 @@ export const insertWordFun = (newData, option, mark) => {
                         let startIndex = text.indexOf(insertWordObj.front);
                         let endIndex = text.indexOf(insertWordObj.after);
                         if (startIndex > -1 && endIndex > -1) {
-                            //  console.log(startIndex,endIndex);
                             text =
                                 text.slice(
                                     0,
@@ -162,7 +145,6 @@ export const insertWordFun = (newData, option, mark) => {
                             insertWordObj.front * 1 < text.length &&
                             insertWordObj.after * 1 < text.length
                         ) {
-                            // console.log( insertWordObj);
                             text =
                                 text.slice(0, insertWordObj.front) +
                                 (insertWord

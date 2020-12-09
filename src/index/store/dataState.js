@@ -1,5 +1,5 @@
 import { deepClone } from "../utils/index"
-import { reqGetData, reqQualityStatistics, reqKeyStatistics, reqUpdate } from "../api"
+import { reqGetData, reqQualityStatistics, reqKeyStatistics } from "../api"
 const state = {
   pageInfo: {
     pageSize: 200,
@@ -105,8 +105,8 @@ const mutations = {
   },
 }
 const actions = {
-  reqGetData({ commit, state }, { pageSize, pageNo, page_id, _id, bid ,callBack}) {
-    // console.log(params);
+  reqGetData({ commit, state }, { pageSize, pageNo, page_id, _id, bid, callBack }) {
+    callBack = callBack ? callBack : (e) => { }
     reqGetData({ pageSize, pageNo, page_id, _id, bid }).then((res) => {
       if (res.data.code === 200 || res.data.code === "200") {
         // console.log(res.data);
@@ -131,13 +131,11 @@ const actions = {
         commit('setColumnsCopy', columns)
         commit('setData', data)
         commit('setCopyData', data)
-      } else {
-        console.log(res);
       }
-      callBack(res.data)
+      callBack(res.data);
     }).catch(error => {
       console.log(error);
-      // callBack(error)
+      callBack(error);
     });
   },
   reqQualityStatistics({ commit, state }, params) {
@@ -159,19 +157,6 @@ const actions = {
         console.log(res);
       }
     }).catch(error => {
-      console.log(error);
-    });
-  },
-  reqUpdate({ commit, state, dispatch }, { params, callBack }) {
-    reqUpdate(params).then((res) => {
-      callBack(res.data);
-      // let pageInfo = state.pageInfo
-      // dispatch("reqGetData", {
-      //   page_id: pageInfo.upId,
-      //   pageSize: pageInfo.pageSize
-      // });
-    }).catch(error => {
-      callBack(res)
       console.log(error);
     });
   }

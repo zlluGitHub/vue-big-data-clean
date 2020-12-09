@@ -7,18 +7,12 @@
           :key="i"
           :class="[
             'column-header',
-            'column-header-' + i === selectClass.header
-              ? 'source-header'
-              : null,
+            'column-header-' + i === selectClass.header ? 'source-header' : null,
             item.zl_state === 'source' ? 'select-header' : null,
             !order ? 'preview' : null,
           ]"
           @click.stop="
-            handleSelectColumnClick(
-              item.label,
-              'column-header-' + i,
-              'row-' + i
-            )
+            handleSelectColumnClick(item.label, 'column-header-' + i, 'row-' + i)
           "
         >
           <!-- <div :style="{ width: item.width ? item.width + 'px' : '200px' }"> -->
@@ -64,7 +58,9 @@
           <!-- :style="{ width: item.width ? item.width + 'px' : '200px' }" -->
           <div
             class="zl-text"
-            @click.stop="handleSelectBlockClick(m, n, item[each.value])"
+            @click.stop="
+              handleSelectBlockClick(m, n, item[each.value], each.value, item._id)
+            "
             v-html="item[each.value]"
           ></div>
           <!-- </Tooltip> -->
@@ -72,9 +68,7 @@
       </tr>
     </table>
     <Modal
-      :title="`修改第 ${textData.rowIndex + 1} 行，第 ${
-        textData.columnIndex
-      } 列`"
+      :title="`修改第 ${textData.rowIndex + 1} 行，第 ${textData.columnIndex} 列`"
       v-model="isModal"
       @on-ok="handleModalOk"
       @on-cancel="handleModalCancel"
@@ -91,6 +85,7 @@
 </template>
 
 <script>
+import { reqUpdate } from "../../api";
 export default {
   name: "app",
   data() {
@@ -153,21 +148,54 @@ export default {
   // },
   methods: {
     handleModalOk() {
-      let { data, columns } = this.$store.state.dataState;
+      let { data, copyData, columns, columnsCopy } = this.$store.state.dataState;
+
       data[this.textData.rowIndex][
         columns[this.textData.columnIndex - 1].value
       ] = this.textData.value;
 
-      // this.$saveData(columns, data);
+      copyData[this.textData.rowIndex][
+        columnsCopy[this.textData.columnIndex - 1].value
+      ] = this.textData.value;
+      this.$event.emit("loading", true);
+      reqUpdate({
+        type: "one",
+        content: {
+          _id: this.textData._id,
+          key: this.textData.key,
+          value: this.textData.value,
+        },
+      })
+        .then((res) => {
+          this.$event.emit("loading", false);
+          if (res.data.code === 200) {
+            this.$Notice.success({
+              title: "更新成功！",
+            });
+          } else {
+            this.$Notice.error({
+              title: "更新失败！",
+            });
+          }
+        })
+        .catch((error) => {
+          this.$Notice.error({
+            title: "网络异常，请稍后再试！",
+          });
+          console.log(error);
+        });
     },
     handleModalCancel() {},
     // 选中某一块
-    handleSelectBlockClick(m, n, text) {
-      // console.log(m, n, text);
+    handleSelectBlockClick(m, n, text, key, _id) {
+      console.log(key, _id);
       this.textData = {
         value: text,
         rowIndex: m,
         columnIndex: n,
+        columnIndex: n,
+        key,
+        _id,
       };
       this.isModal = !this.isModal;
     },

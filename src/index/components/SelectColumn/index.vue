@@ -1,16 +1,9 @@
 <template>
   <div>
-    <Select
-      v-model="columnType"
-      placeholder="选择方式"
-      @on-change="handleColumnType"
-    >
-      <Option
-        v-for="item in columnTypeList"
-        :value="item.value"
-        :key="item.value"
-        >{{ item.label }}</Option
-      >
+    <Select v-model="columnType" placeholder="选择方式" @on-change="handleColumnType">
+      <Option v-for="item in columnTypeList" :value="item.value" :key="item.value">{{
+        item.label
+      }}</Option>
     </Select>
     <Select
       v-if="columnType === 'more'"
@@ -18,37 +11,20 @@
       multiple
       style="margin-top: 5px"
     >
-      <Option
-        v-for="item in columnList"
-        :value="item.value"
-        :key="item.value"
-        >{{ item.label }}</Option
-      >
+      <Option v-for="item in columnList" :value="item.value" :key="item.value">{{
+        item.label
+      }}</Option>
     </Select>
     <template v-if="columnType === 'range'">
-      <Select
-        placeholder="选择开始列"
-        v-model="rangeValue.start"
-        style="margin-top: 5px"
-      >
-        <Option
-          v-for="item in columnList"
-          :value="item.value"
-          :key="item.value"
-          >{{ item.label }}</Option
-        >
+      <Select placeholder="选择开始列" v-model="rangeValue.start" style="margin-top: 5px">
+        <Option v-for="item in columnList" :value="item.value" :key="item.value">{{
+          item.label
+        }}</Option>
       </Select>
-      <Select
-        placeholder="选择结束列"
-        v-model="rangeValue.end"
-        style="margin-top: 5px"
-      >
-        <Option
-          v-for="item in columnList"
-          :value="item.value"
-          :key="item.value"
-          >{{ item.label }}</Option
-        >
+      <Select placeholder="选择结束列" v-model="rangeValue.end" style="margin-top: 5px">
+        <Option v-for="item in columnList" :value="item.value" :key="item.value">{{
+          item.label
+        }}</Option>
       </Select>
     </template>
     <Input
@@ -103,8 +79,8 @@ export default {
     columnArr: {
       // deep: true,
       handler: function (newV, oldV) {
-        console.log(newV);
-        if (newV.length) {
+        // console.log(newV);
+        if (newV.length !== 0) {
           let { columnsCopy } = this.dataState;
           let newColumnsCopy = deepClone(columnsCopy);
           newColumnsCopy.forEach((item) => {
@@ -122,7 +98,7 @@ export default {
     rangeValue: {
       deep: true,
       handler: function (newV, oldV) {
-        if (newV) {
+        if (newV[0] && newV[0].start) {
           this.columnArr = this.handleColumnMatch(newV.start, newV.end);
         }
       },
@@ -167,9 +143,16 @@ export default {
 
   methods: {
     handleClear(mark) {
-      let { copyData, columnsCopy } = this.dataState;
-      this.$store.commit("setColumns", columnsCopy);
-      this.$store.commit("setData", deepClone(copyData));
+      let { columns } = this.dataState;
+      this.columnArr = [];
+      this.$store.commit(
+        "setColumns",
+        columns.map((item) => {
+          item.zl_state = "";
+          return item;
+        })
+      );
+      // this.$store.commit("setData", deepClone(copyData));
       if (!mark) {
         this.columnType = "";
       }

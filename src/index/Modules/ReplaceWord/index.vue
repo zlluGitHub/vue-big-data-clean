@@ -4,27 +4,17 @@
       <li>
         <div class="title">选择列数据</div>
         <div class="content">
-          <SelectColumn
-            @on-change="handleOnChangeSelectColumn"
-            ref="selectColumn"
-          />
+          <SelectColumn @on-change="handleOnChangeSelectColumn" ref="selectColumn" />
         </div>
       </li>
       <li>
         <div class="title">元素替换</div>
         <div class="content element-sub">
-          <div
-            class="item"
-            v-for="(item, i) in characterArr"
-            :key="item.source"
-          >
+          <div class="item" v-for="(item, i) in characterArr" :key="'w' + i">
             <Input v-model="item.source" placeholder="替换元素..." />
             <Icon type="md-arrow-round-forward" />
             <Input v-model="item.target" placeholder="目标元素..." />
-            <Icon
-              type="ios-add-circle-outline"
-              @click.stop="handleCharacterArr('add')"
-            />
+            <Icon type="ios-add-circle-outline" @click.stop="handleCharacterArr('add')" />
             <Icon
               v-if="characterArr && characterArr.length !== 1"
               type="ios-trash-outline"
@@ -45,7 +35,7 @@
       </li> -->
     </ul>
     <div class="button-warp">
-      <Button @click="handleOKOrCancel(false)">取消</Button>
+      <Button @click="handleOKOrCancel(false)">重置</Button>
       <Button type="primary" @click="handleOKOrCancel('ok')">确定</Button>
     </div>
   </div>
@@ -53,6 +43,7 @@
 <script>
 import SelectColumn from "../../components/SelectColumn/index";
 import { deepClone } from "../../utils/index";
+import { reqUpdate } from "../../api";
 import { replaceWord } from "../../utils/processing";
 export default {
   components: { SelectColumn },
@@ -77,7 +68,9 @@ export default {
     characterArr: {
       deep: true,
       handler: function (newV, oldV) {
-        this.handleData(newV, "view");
+        if (newV[0] && newV[0].source) {
+          this.handleData(newV, "view");
+        }
       },
     },
   },
@@ -90,30 +83,58 @@ export default {
     handleOnChangeSelectColumn(arr) {
       this.columnArr = arr;
     },
+    handleClear() {
+      this.$refs.selectColumn.handleClear();
+      this.characterArr = [{ source: "", target: "" }];
+    },
 
     handleOKOrCancel(mark) {
       if (mark === "ok") {
-        this.$event.emit("loading", true);
-        this.$store.dispatch("reqUpdate", {
-          params: {
-            columns: this.columnArr,
-            replace: this.characterArr,
-          },
-          callBack: (res) => {
-            this.handleData(this.characterArr);
-            this.$event.emit("loading", false);
-          },
-        });
-
+        if (this.columnArr.length) {
+          this.$event.emit("loading", true);
+          reqUpdate({
+            type: "more",
+            content: {
+              columns: this.columnArr,
+              replace: this.characterArr,
+            },
+          })
+            .then((res) => {
+              this.$event.emit("loading", false);
+              if (res.data.code === 200) {
+                this.handleData(this.characterArr);
+                this.handleClear();
+                this.$Modal.success({
+                  title: "系统提示",
+                  content: `总共：${res.data.tatol}条，成功：${res.data.success}条，失败：${res.data.error}条`,
+                });
+              } else {
+                this.$Notice.error({
+                  title: "操作失败！",
+                });
+              }
+            })
+            .catch((error) => {
+              this.$event.emit("loading", false);
+              this.$Notice.error({
+                title: "网络异常，请稍后再试！",
+              });
+              console.log(error);
+            });
+        } else {
+          this.$Notice.warning({
+            title: "请输入相关内容后操作！",
+          });
+        }
         // this.$store.commit("setStepDataArr", {
         //   module: this.moduleObj,
         //   columnArr: this.columnArr,
         //   characterArr: this.characterArr,
         // });
       } else {
-        this.$refs.selectColumn.handleClear();
-        this.columnArr = [];
-        this.characterArr = [{ source: "", target: "" }];
+        if (this.columnArr.length) {
+          this.handleClear();
+        }
       }
       // this.$emit("on-button-click");
     },
@@ -129,10 +150,10 @@ export default {
         mark
       );
       this.$store.commit("setData", newData);
-      // if (mark !== "view") {
-      //   this.$store.commit("setCopyData", newData);
-      //   // this.$Notice.success({ title: "批量替换成功！" });
-      // }
+      if (mark !== "view") {
+        this.$store.commit("setCopyData", newData);
+        // this.$Notice.success({ title: "批量替换成功！" });
+      }
     },
     handleCharacterArr(mark, index) {
       if (index) {
