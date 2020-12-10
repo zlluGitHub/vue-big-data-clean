@@ -5,7 +5,7 @@ let SchemaClass = new Schema({
     //     type: String,
     //     default: ""
     // }
-});
+}, { strict: false });
 
 // 输出(导出);
 module.exports = mongoose.model('cshis', SchemaClass);

@@ -1,6 +1,9 @@
 import Vue from 'vue';
 
 Vue.prototype.$saveData = function (columns, data) {
+    columns = columns.filter(item => {
+        return item !== '_id'
+    })
     this.$store.commit("setData", data);
     this.$store.commit("setColumns", columns);
     this.$store.commit("setColumnsCopy", columns);
@@ -50,7 +53,7 @@ export const dataQualityStatistics = (jsonData) => {
         frequencyObj[key] = repeatTime(timeArr);
 
     });
-    console.log(newObj);
+    // console.log(newObj);
     return {
         whole: newObj,// 元素缺失率
         frequency: frequencyObj// 统计数组中元素的重复次数
@@ -79,7 +82,7 @@ export const replaceWord = (newData, option, mark) => {
                 });
             }
         });
-      
+
         return item;
     });
 };
@@ -109,6 +112,7 @@ export const deleteWord = (newData, option, mark) => {
 
 // 批量插入指定元素
 export const insertWordFun = (newData, option, mark) => {
+    console.log(option);
     let { columnArr, matchRules, insertWord, insertWordObj } = option;
     return newData.map((item, i) => {
         columnArr.forEach((key, index) => {
@@ -127,18 +131,11 @@ export const insertWordFun = (newData, option, mark) => {
                                 ? `<span class="add-highlight">${insertWord}</span>`
                                 : "");
                     } else if (matchRules === "between") {
-                        let startIndex = text.indexOf(insertWordObj.front);
-                        let endIndex = text.indexOf(insertWordObj.after);
-                        if (startIndex > -1 && endIndex > -1) {
-                            text =
-                                text.slice(
-                                    0,
-                                    startIndex + insertWordObj.front.length
-                                ) +
-                                (insertWord
-                                    ? `<span class="add-highlight">${insertWord}</span>`
-                                    : "") +
-                                text.slice(endIndex, text.length);
+                        let isExist = text.indexOf(insertWordObj.front + insertWordObj.after);
+                        if (isExist > -1) {
+                            text = text.replace(new RegExp(insertWordObj.front + insertWordObj.after, 'gi'), insertWordObj.front + (insertWord
+                                ? `<span class="add-highlight">${insertWord}</span>`
+                                : "") + insertWordObj.after);
                         }
                     } else if (matchRules === "position") {
                         if (
@@ -159,16 +156,9 @@ export const insertWordFun = (newData, option, mark) => {
                     } else if (matchRules === "end") {
                         text = text + insertWord;
                     } else if (matchRules === "between") {
-                        let startIndex = text.indexOf(insertWordObj.front);
-                        let endIndex = text.indexOf(insertWordObj.after);
-                        if (startIndex > -1 && endIndex > -1) {
-                            text =
-                                text.slice(
-                                    0,
-                                    startIndex + insertWordObj.front.length
-                                ) +
-                                insertWord +
-                                text.slice(endIndex, text.length);
+                        let isExist = text.indexOf(insertWordObj.front + insertWordObj.after);
+                        if (isExist > -1) {
+                            text = text.replace(new RegExp(insertWordObj.front + insertWordObj.after, 'gi'), insertWordObj.front + insertWord + insertWordObj.after);
                         }
                     } else if (matchRules === "position") {
                         if (
@@ -198,7 +188,7 @@ export const columnsIntoArray = (newData, option, mark) => {
         columnArr.forEach((key, index) => {
             if (item[key]) {
                 newArr.push(item[key]);
-                columnNamePar = columnName ? columnName : key + '_copy';
+                columnNamePar = columnName ? columnName : 'column_name';
             };
         });
 
@@ -237,7 +227,7 @@ export const columnsIntoObj = (newData, option, mark) => {
         columnArr.forEach((key, index) => {
             if (item[key]) {
                 newObj[key] = item[key];
-                columnNamePar = columnName ? columnName : key + '_copy';
+                columnNamePar = columnName ? columnName : 'column_name';
             };
         });
         if (mark === "view") {
@@ -264,5 +254,27 @@ export const columnsIntoObj = (newData, option, mark) => {
         newColumns = columns;
     }
     return { columns: newColumns, tableData: newTableData }
+
+}
+
+export const deleteColumns = (newData, columnArr, mark) => {
+
+    newData.forEach((item, i) => {
+        columnArr.forEach((key, index) => {
+            if (item[key]) {
+                delete item[key];
+            };
+        });
+    });
+
+    let columns = []
+    for (const key in newData[0]) {
+        columns.push({
+            label: key,
+            value: key,
+        })
+    }
+    console.log(columns);
+    return { columns, tableData: newData }
 
 }

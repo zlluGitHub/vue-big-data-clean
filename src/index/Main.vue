@@ -2,10 +2,7 @@
   <div class="main">
     <div class="left" ref="leftWarp" :style="{ width: leftWarpWidth + 'px' }">
       <div class="zl-toolbar-container">
-        <ToolBarTop
-          :moduleConfig="menuData"
-          @on-clear-select="handleClearClick"
-        />
+        <ToolBarTop :moduleConfig="menuData" @on-clear-select="handleClearClick" />
       </div>
       <div class="zl-table-content">
         <div class="source scrollbar" :style="sourceStyle" ref="source">
@@ -18,30 +15,33 @@
             />
           </div>
         </div>
-        <div
-          class="preview scrollbar"
-          :style="previewStyle"
-          v-if="previewData.tableData && previewData.columns"
-        >
-          <PreviewTable
-            :data="previewData.tableData"
-            :column="previewData.columns"
-          />
-        </div>
+        <transition name="transition-drawer">
+          <div
+            class="preview scrollbar"
+            :style="previewStyle"
+            v-if="previewData.tableData && previewData.columns"
+          >
+            <PreviewTable :data="previewData.tableData" :column="previewData.columns" />
+          </div>
+        </transition>
         <!-- <Table :data="tableData" :column="columnsData" /> -->
-        <Loading v-if="loading.state" :text="loading.text" />
+        <transition name="show">
+          <Loading v-if="loading.state" :text="loading.text" />
+        </transition>
       </div>
       <div class="zl-toolbar-bottom">
         <ToolBarBottom :toolBar="footerInfo" />
       </div>
     </div>
-    <div class="right" v-show="isOpenDrawer">
-      <Drawer
-        :info="menuData.infoTatistics"
-        @on-close="onDrawerClose"
-        :height="height"
-      />
-    </div>
+    <transition name="transition-drawer">
+      <div class="right" v-show="isOpenDrawer">
+        <Drawer
+          :info="menuData.infoTatistics"
+          @on-close="onDrawerClose"
+          :height="height"
+        />
+      </div>
+    </transition>
   </div>
 </template>
 <script>
@@ -107,7 +107,7 @@ export default {
     preview(newVal, oldVal) {
       console.log(newVal, "--previewData--");
       this.$nextTick(() => {
-        this.setSize(newVal);
+        this.setSize();
       });
       this.previewData = newVal;
     },
@@ -130,15 +130,14 @@ export default {
     let indexTableWarp = this.$refs.indexTableWarp;
     let isLoading = true;
     let pageNo = 1;
+    let scrollHeight = -1;
     // 监听这个dom的scroll事件
     source.onscroll = () => {
-      // console.log(indexTableWarp.offsetHeight);
-      // console.log(source.scrollTop);
-      // console.log(indexTableWarp.offsetHeight - (source.scrollTop + this.height));
-      let residualHeight =
-        indexTableWarp.offsetHeight - (source.scrollTop + this.height);
-      if (isLoading && residualHeight < 2000) {
+      let residualHeight = indexTableWarp.offsetHeight - (source.scrollTop + this.height);
+
+      if (isLoading && scrollHeight !== residualHeight && residualHeight < 2000) {
         isLoading = false;
+        scrollHeight = residualHeight;
         // let { upId, downId } = this.$store.state.dataState.pageInfo;
         this.$store.dispatch("reqGetData", {
           pageNo: 1,
@@ -173,6 +172,7 @@ export default {
   methods: {
     onIsOpenDrawer(state) {
       this.isOpenDrawer = state;
+      this.setSize();
     },
     handleClearClick(state) {
       this.$refs.indexTable.handleClearClick();
@@ -181,9 +181,14 @@ export default {
       this.$store.commit("setColumns", this.$store.state.dataState.columnsCopy);
       this.isOpenDrawer = false;
       this.$store.commit("setPreviewData", []);
-      this.$event.emit("menu-type", {
-        type: "data-tatistics",
-      });
+
+      let time = setTimeout(() => {
+        this.$event.emit("menu-type", {
+          type: "data-tatistics",
+        });
+        clearTimeout(time);
+      }, 2000);
+
       this.$refs.indexTable.handleClearClick();
     },
     onLoading(state, text) {
@@ -192,7 +197,7 @@ export default {
     // handleOnClick(state) {
     //   this.isOpenDrawer = state;
     // },
-    setSize(newVal) {
+    setSize() {
       // let tableContentWidth = this.$refs.tableContent.clientWidth;
 
       if (this.isOpenDrawer) {
@@ -238,9 +243,12 @@ export default {
         width: 100%;
         flex: 1;
       }
-      // .preview {
-
-      // }
+      .preview {
+        max-width: 600px;
+        margin-left: 3px;
+        border-left: 2px solid #e7e6eb;
+        // background: #fffbdc;
+      }
     }
     .zl-toolbar-bottom {
       position: absolute;
@@ -253,18 +261,6 @@ export default {
     width: 450px;
     border-left: 1px solid #eee;
     // background: #eee;
-  }
-  /deep/ .ivu-spin {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    color: #515a6e;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.9);
   }
 }
 </style>

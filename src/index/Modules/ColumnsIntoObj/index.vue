@@ -4,10 +4,7 @@
       <li>
         <div class="title">选择列数据</div>
         <div class="content">
-          <SelectColumn
-            @on-change="handleOnChangeSelectColumn"
-            ref="selectColumn"
-          />
+          <SelectColumn @on-change="handleOnChangeSelectColumn" ref="selectColumn" />
         </div>
       </li>
       <li>
@@ -27,6 +24,7 @@
 import SelectColumn from "../../components/SelectColumn/index";
 import { deepClone } from "../../utils/index";
 import { columnsIntoObj } from "../../utils/processing";
+import { reqAdd } from "../../api";
 export default {
   components: { SelectColumn },
   data() {
@@ -60,25 +58,60 @@ export default {
     handleOnChangeSelectColumn(arr) {
       this.columnArr = arr;
     },
-    // handleClearData() {
-    //   this.columnArr = [];
-    // },
+    handleClear() {
+      this.$refs.selectColumn.handleClear();
+      // this.columnArr = [];
+      this.columnName = "";
+      this.$store.commit("setPreviewData", []);
+    },
     handleOKOrCancel(mark) {
       let { copyData, columnsCopy } = this.dataState;
       if (mark === "ok") {
-        // 缓存数据
-        this.handleData();
-        this.$store.commit("setStepDataArr", {
-          columnArr: this.columnArr,
-          columnName: this.columnName,
-        });
-        this.$store.commit("setPreviewData", { show: false });
-        // this.$emit("on-button-click");
+        if (this.columnArr.length) {
+          this.$event.emit("loading", true);
+          reqAdd({
+            type: "field_obj",
+            content: {
+              columnArr: this.columnArr,
+              columnName: this.columnName,
+            },
+          })
+            .then((res) => {
+              this.$event.emit("loading", false);
+              if (res.data.code === 200) {
+                this.handleData();
+                this.handleClear();
+                this.$Modal.success({
+                  title: "系统提示",
+                  content: `总共：${res.data.tatol}条，成功：${res.data.success}条，失败：${res.data.error}条`,
+                });
+              } else {
+                this.$Notice.error({
+                  title: "操作失败！",
+                });
+              }
+            })
+            .catch((error) => {
+              this.$event.emit("loading", false);
+              this.$Notice.error({
+                title: "网络异常，请稍后再试！",
+              });
+              console.log(error);
+            });
+        } else {
+          this.$Notice.warning({
+            title: "请输入相关内容后操作！",
+          });
+        }
+        // this.$store.commit("setStepDataArr", {
+        //   module: this.moduleObj,
+        //   columnArr: this.columnArr,
+        //   characterArr: this.characterArr,
+        // });
       } else {
-        this.$refs.selectColumn.handleClear();
-        // this.columnArr = [];
-        this.columnName = "";
-        this.$store.commit("setPreviewData", []);
+        if (this.columnArr.length) {
+          this.handleClear();
+        }
       }
     },
     handleData(mark) {

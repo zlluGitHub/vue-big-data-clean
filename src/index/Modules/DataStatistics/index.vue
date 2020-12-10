@@ -17,11 +17,7 @@
                   <span>{{
                     item.value ? item.value.valid + "/" + item.value.tatol : 0
                   }}</span
-                  ><span
-                    >{{
-                      item.value ? parseInt(item.value.percentage) : 0
-                    }}%</span
-                  >
+                  ><span>{{ item.value ? parseInt(item.value.percentage) : 0 }}%</span>
                 </p>
               </div>
               <div class="block">
@@ -54,15 +50,10 @@
             <input type="text" v-model="inputValue" />
             <img src="../../assets/search.svg" />
           </div>
-          <ul
-            class="scrollbar"
-            v-if="keyStatisticsData && keyStatisticsData.length"
-          >
+          <ul class="scrollbar" v-if="keyStatisticsData && keyStatisticsData.length">
             <li v-for="(item, i) in keyStatisticsData" :key="'q' + i">
               <label> {{ item.type }} </label>
-              <span
-                >{{ item.percentage ? item.percentage.toFixed(2) : 0 }}%</span
-              >
+              <span>{{ item.percentage ? item.percentage.toFixed(2) : 0 }}%</span>
               <em
                 :style="{
                   width: (item.percentage ? item.percentage : 0) + '%',
@@ -259,7 +250,10 @@ $borderRadius: 5px;
         height: 20px;
         margin: 5px 0;
         label {
-          // color: #fff;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          word-break: break-all;
           z-index: 1;
         }
         span {

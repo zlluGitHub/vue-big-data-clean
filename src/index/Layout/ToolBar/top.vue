@@ -11,30 +11,60 @@
             <img src="../../assets/th.svg" />
             <img src="../../assets/xxjt.svg" class="arrow-icon" />
           </div>
-          <ol v-if="moduleConfig.repInsWord && menuType === 'repInsWord'">
-            <li
-              v-for="(item, i) in moduleConfig.repInsWord"
-              :key="i"
-              @click="handleMenuClickItem(item)"
-            >
-              {{ item.title }}
-            </li>
-          </ol>
+          <transition name="show">
+            <ol v-if="moduleConfig.repInsWord && menuType === 'repInsWord'">
+              <li
+                v-for="(item, i) in moduleConfig.repInsWord"
+                :key="i"
+                @click="handleMenuClickItem(item)"
+              >
+                {{ item.title }}
+              </li>
+            </ol>
+          </transition>
         </li>
         <li>
           <div @click="handleMenuSwitch('arrAndObj')">
             <img src="../../assets/zkh.svg" />
             <img src="../../assets/xxjt.svg" class="arrow-icon" />
           </div>
-          <ol v-if="moduleConfig.arrAndObj && menuType === 'arrAndObj'">
-            <li
-              v-for="(item, i) in moduleConfig.arrAndObj"
-              :key="i"
-              @click="handleMenuClickItem(item)"
-            >
-              {{ item.title }}
-            </li>
-          </ol>
+          <transition name="show">
+            <ol v-if="moduleConfig.arrAndObj && menuType === 'arrAndObj'">
+              <li
+                v-for="(item, i) in moduleConfig.arrAndObj"
+                :key="i"
+                @click="handleMenuClickItem(item)"
+              >
+                {{ item.title }}
+              </li>
+            </ol>
+          </transition>
+        </li>
+        <!-- <li>
+          <div @click="handleMenuSwitch('format')">
+            <img src="../../assets/a.svg" />
+            <img src="../../assets/xxjt.svg" class="arrow-icon" />
+          </div>
+          <transition name="show">
+            <ol v-if="moduleConfig.format && menuType === 'format'">
+              <li
+                v-for="(item, i) in moduleConfig.format"
+                :key="i"
+                @click="handleMenuClickItem(item)"
+              >
+                {{ item.title }}
+              </li>
+            </ol>
+          </transition>
+        </li> -->
+        <li>
+          <div @click="handleMenuSwitch('delete')">
+            <img
+              src="../../assets/decon.svg"
+              class="zl_icon"
+              @click="handleMenuClickItem(moduleConfig.delete)"
+            />
+          </div>
         </li>
       </ul>
     </div>
@@ -45,18 +75,16 @@
             <img src="../../assets/fil.svg" />
             <img src="../../assets/xxjt.svg" class="arrow-icon" />
           </div>
-          <ol v-if="moduleConfig.arrAndObj && menuType === 'filter-column'">
-            <FilterColumn v-model="columnArr" />
-          </ol>
+          <transition name="show">
+            <ol v-if="moduleConfig.arrAndObj && menuType === 'filter-column'">
+              <FilterColumn v-model="columnArr" />
+            </ol>
+          </transition>
         </li>
       </ul>
     </div>
     <!-- 遮罩层 -->
-    <div
-      class="mask-box"
-      v-if="menuType"
-      @click="handleMenuSwitch(false)"
-    ></div>
+    <div class="mask-box" v-if="menuType" @click="handleMenuSwitch(false)"></div>
   </div>
 </template>
 <script>

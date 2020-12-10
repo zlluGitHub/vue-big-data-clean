@@ -46,29 +46,29 @@ ol {
         }
     }
 }
-
+$border-radius: 1px;
 .del-highlight {
-    background: #ec7259;
+    background: #ec7159af;
     color: #fff;
     padding: 1px 3px;
     margin: 0 1px;
-    border-radius: 2px;
+    border-radius: $border-radius;
     text-decoration: line-through;
 }
 .add-highlight {
-    background: rgb(25, 190, 107);
+    background: rgba(25, 190, 107, 0.7);
     color: #fff;
     padding: 1px 3px;
-    border-radius: 2px;
+    border-radius: $border-radius;
     margin: 0 1px;
 }
 
 .rep-highlight {
-    background: rgb(25, 190, 107);
+    background: rgba(25, 190, 107, 0.7);
     // background: rgb(255, 153, 0);
     color: #fff;
     padding: 1px 3px;
-    border-radius: 2px;
+    border-radius: $border-radius;
     margin: 0 1px;
 }
 
@@ -92,8 +92,9 @@ ol {
     cursor: pointer;
     background: #b4bccd;
 }
-.show-enter-active {
-    transition: all 0.25s ease-in;
+.show-enter-active,
+.show-leave-active {
+    transition: all 0.1s ease-in;
 }
 .show-enter,
 .show-leave-to {
@@ -107,14 +108,29 @@ ol {
     /* transform: scale(1); */
     margin-top: 0px;
 }
-.hidden-enter,
-.hidden-leave-active {
+
+.transition-drawer-enter-active,
+.transition-drawer-leave-active {
+    transition: all 0.1s ease-in;
+}
+.transition-drawer-enter,
+.transition-drawer-leave-to {
     /* transform: scale(0.9); */
-    transition: all 0.25s ease-in;
     opacity: 0;
 }
-.hidden-enter-active,
-.hidden-leave {
+.transition-drawer-enter-to,
+.transition-drawer-leave {
     opacity: 1;
-    /* transform: scale(1); */
 }
+
+// .hidden-enter,
+// .hidden-leave-active {
+//     /* transform: scale(0.9); */
+//     transition: all 0.25s ease-in;
+//     opacity: 0;
+// }
+// .hidden-enter-active,
+// .hidden-leave {
+//     opacity: 1;
+//     /* transform: scale(1); */
+// }

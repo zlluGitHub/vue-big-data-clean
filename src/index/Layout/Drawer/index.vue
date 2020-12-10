@@ -4,11 +4,8 @@
       <span>{{ moduleObj.title }}</span>
       <img src="../../assets/delete.svg" @click="handleClose" />
     </div>
-    <div
-      v-if="moduleObj.type === 'data-tatistics'"
-      class="zl-drawer-item"
-      :style="style"
-    >
+    <!-- <transition name="show"> -->
+    <div v-if="moduleObj.type === 'data-tatistics'" class="zl-drawer-item" :style="style">
       <DataStatistics :moduleObj="moduleObj" />
     </div>
     <div
@@ -47,7 +44,15 @@
     >
       <ColumnsIntoObj :moduleObj="moduleObj" />
     </div>
+    <div
+      v-else-if="moduleObj.type === 'columns-delete'"
+      class="zl-drawer-item"
+      :style="style"
+    >
+      <DeleteColumns :moduleObj="moduleObj" />
+    </div>
     <div v-else></div>
+    <!-- </transition> -->
   </div>
 </template>
 <script>
@@ -57,6 +62,7 @@ import DeleteWord from "../../Modules/DeleteWord";
 import InsertWord from "../../Modules/InsertWord";
 import ColumnsIntoArray from "../../Modules/ColumnsIntoArray";
 import ColumnsIntoObj from "../../Modules/ColumnsIntoObj";
+import DeleteColumns from "../../Modules/DeleteColumns";
 export default {
   components: {
     DataStatistics,
@@ -65,6 +71,7 @@ export default {
     InsertWord,
     ColumnsIntoArray,
     ColumnsIntoObj,
+    DeleteColumns,
   },
   data() {
     return {
@@ -93,6 +100,7 @@ export default {
   },
   methods: {
     onMenuType(item) {
+      this.$store.commit("setPreviewData", {});
       this.moduleObj = item;
     },
     handleClose() {

@@ -1,5 +1,5 @@
 <template>
-  <div class="zl-table-box" @click.stop="handleClearClick">
+  <div class="zl-table-box preview-warp" @click.stop="handleClearClick">
     <table border="0" cellspacing="0" cellpadding="0">
       <tr>
         <th
@@ -14,7 +14,7 @@
       </tr>
       <tr v-for="(item, m) in tableData" :key="m">
         <td v-for="(each, n) in columns" :key="n" :class="['row', 'preview']">
-          <div
+          <div class="zl-preview-text"
             @click.stop="handleSelectBlockClick(m, n, item[each.value])"
             v-html="item[each.value]"
           ></div>

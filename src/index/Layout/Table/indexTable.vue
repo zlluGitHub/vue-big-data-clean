@@ -70,6 +70,7 @@
     <Modal
       :title="`修改第 ${textData.rowIndex + 1} 行，第 ${textData.columnIndex} 列`"
       v-model="isModal"
+      ok-text="提交"
       @on-ok="handleModalOk"
       @on-cancel="handleModalCancel"
       :closable="false"

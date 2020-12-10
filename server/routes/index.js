@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const path = require("path");
+// const path = require("path");
 const fs = require("fs");
-// const dataBase = require("../schema");
+const dataBase = require("../schema");
 // const dataBase = require("../schema/indexWz");
-const dataBase = require("../schema/min_cshis");
+// const dataBase = require("../schema/min_cshis");
 
 // 获取所有数据
 router.get('/get/data', (req, res, next) => {
@@ -175,7 +175,7 @@ router.get('/get/keyStatistics', (req, res, next) => {
 })
 
 // 修改替换数据
-router.post('/get/update', (req, res, next) => {
+router.post('/update/data', (req, res, next) => {
     let { type, content } = req.body;
 
     if (type === 'one') {
@@ -272,10 +272,39 @@ router.post('/get/update', (req, res, next) => {
 })
 
 // 修改删除数据
-router.post('/get/delete', (req, res, next) => {
+router.post('/delete/data', (req, res, next) => {
     let { type, content } = req.body;
 
-    if (type === 'columns') {
+    if (type === 'column') {
+        let { columns } = content;
+        dataBase.find({}, (err, data) => {
+            if (err) {
+                console.log(err);
+            } else {
+                data = JSON.parse(JSON.stringify(data));
+
+                let countObj = {
+                    tatol: 0, success: 0, error: 0
+                };
+                data.forEach((item, i) => {
+                    let obj = {}
+
+                    columns.forEach(key => {
+                        if (item[key]) {
+                            obj[key] = item[key];
+                        };
+                    });
+                    // console.log(obj);
+                    dataBase.updateMany({ _id: item._id }, { $unset: obj }, (err) => {
+                        resCallBack(err, countObj, data, res);
+                    });
+                });
+            }
+        })
+
+
+
+
         // let { _id, key, value } = content;
         // let obj = {};
         // obj[key] = value;
@@ -287,6 +316,7 @@ router.post('/get/delete', (req, res, next) => {
         //         res.json({ result: true, code: 200, mas: "更新成功！" });
         //     }
         // });
+
     } else if (type === 'word') {
         let { columns, word } = content;
         // console.log(columns, word);
@@ -363,4 +393,233 @@ router.post('/get/delete', (req, res, next) => {
     }
 })
 
+// 插入数据
+router.post('/insert/data', (req, res, next) => {
+    let { type, content } = req.body;
+
+    if (type === 'columns') {
+        // let { _id, key, value } = content;
+        // let obj = {};
+        // obj[key] = value;
+        // dataBase.updateOne({ _id }, { $set: obj }, (err, data) => {
+        //     if (err) {
+        //         console.log(err);
+        //         res.json({ result: false, code: 500, mas: "未找到匹配项！" });
+        //     } else {
+        //         res.json({ result: true, code: 200, mas: "更新成功！" });
+        //     }
+        // });
+    } else if (type === 'word') {
+        let { columnArr, insertWord, insertWordObj, matchRules } = content;
+        // console.log(columns, word);
+        let countObj = {
+            tatol: 0, success: 0, error: 0
+        };
+        if (matchRules === 'start') {
+
+            dataBase.find({}, (err, data) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    data = JSON.parse(JSON.stringify(data));
+                    data.forEach(item => {
+                        let obj = {}
+                        columnArr.forEach(key => {
+                            obj[key] = insertWord + item[key];
+                        })
+                        dataBase.updateMany({ _id: item._id }, { $set: obj }, (err) => {
+                            resCallBack(err, countObj, data, res);
+                        });
+                    })
+                }
+            })
+
+        } else if (matchRules === 'end') {
+
+            dataBase.find({}, (err, data) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    data = JSON.parse(JSON.stringify(data));
+                    data.forEach(item => {
+                        let obj = {}
+                        columnArr.forEach(key => {
+                            obj[key] = item[key] + insertWord
+                        })
+                        dataBase.updateMany({ _id: item._id }, { $set: obj }, (err) => {
+                            resCallBack(err, countObj, data, res);
+                        });
+                    });
+                }
+            })
+
+        } else if (matchRules === 'position') {
+
+            dataBase.find({}, (err, data) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    data = JSON.parse(JSON.stringify(data));
+                    data.forEach(item => {
+                        let obj = {}
+                        columnArr.forEach(key => {
+                            obj[key] = item[key].slice(0, insertWordObj.front) +
+                                insertWord +
+                                item[key].slice(insertWordObj.after, item[key].length);
+                        })
+                        dataBase.updateMany({ _id: item._id }, { $set: obj }, (err) => {
+                            resCallBack(err, countObj, data, res);
+                        });
+                    });
+                }
+            })
+
+        } else if (matchRules === 'between') {
+            let filterArr = [];
+            columnArr.forEach(key => {
+                let filterObj = {}
+                let regExp = insertWordObj.front + insertWordObj.after;
+                // word.forEach(val => {
+                // regExp = '&&' + val + regExp
+                // })
+                // regExp = regExp.slice(1, regExp.length);
+                filterObj[key] = { $regex: new RegExp(`${regExp}`, 'i') }
+                filterArr.push(filterObj)
+            });
+
+
+            let promise = new Promise((resolve, reject) => {
+                dataBase.find({ $or: filterArr }, (err, data) => {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(JSON.parse(JSON.stringify(data)))
+                    }
+                })
+            });
+            promise.then(dataArr => {
+                // console.log(dataArr);
+                dataArr.forEach(item => {
+                    let obj = {}
+                    columnArr.forEach(key => {
+                        obj[key] = item[key].replace(new RegExp(insertWordObj.front + insertWordObj.after, 'gi'), insertWordObj.front + insertWord + insertWordObj.after)
+                    })
+                    dataBase.updateMany({ _id: item._id }, { $set: obj }, (err, data) => {
+                        resCallBack(err, countObj, dataArr, res);
+                    });
+                });
+            }, err => {
+                console.log('错误信息：', err);
+                res.json({ result: false, code: 500 });
+            })
+
+        }
+
+
+    }
+})
+
+
+// 插入新字段数据
+router.post('/add/data', (req, res, next) => {
+    let { type, content } = req.body;
+
+    if (type === 'columns') {
+        // let { _id, key, value } = content;
+        // let obj = {};
+        // obj[key] = value;
+        // dataBase.updateOne({ _id }, { $set: obj }, (err, data) => {
+        //     if (err) {
+        //         console.log(err);
+        //         res.json({ result: false, code: 500, mas: "未找到匹配项！" });
+        //     } else {
+        //         res.json({ result: true, code: 200, mas: "更新成功！" });
+        //     }
+        // });
+    } else if (type === 'field_arr') {
+        let { columnArr, columnName } = content;
+        dataBase.find({}, (err, data) => {
+            if (err) {
+                console.log(err);
+            } else {
+                data = JSON.parse(JSON.stringify(data));
+
+                let countObj = {
+                    tatol: 0, success: 0, error: 0
+                };
+                columnName = columnName ? columnName : 'column_name';
+                data.forEach((item, i) => {
+                    let itemObj = {}, newArr = [];
+                    columnArr.forEach((key, index) => {
+                        if (item[key]) {
+                            newArr.push(item[key]);
+                        };
+                    });
+                    itemObj[columnName] = JSON.stringify(newArr)
+
+                    dataBase.updateMany({ _id: item._id }, { $set: itemObj }, (err) => {
+                        resCallBack(err, countObj, data, res);
+                    });
+
+                });
+            }
+        })
+    } else if (type === 'field_obj') {
+        let { columnArr, columnName } = content;
+        dataBase.find({}, (err, data) => {
+            if (err) {
+                console.log(err);
+            } else {
+                data = JSON.parse(JSON.stringify(data));
+
+                let countObj = {
+                    tatol: 0, success: 0, error: 0
+                };
+                columnName = columnName ? columnName : 'column_name';
+                data.forEach((item, i) => {
+                    let itemObj = {}, newObj = {};
+                    columnArr.forEach((key, index) => {
+                        if (item[key]) {
+                            newObj[key] = item[key];
+                        };
+                    });
+                    itemObj[columnName] = JSON.stringify(newObj)
+
+                    dataBase.updateMany({ _id: item._id }, { $set: itemObj }, (err) => {
+                        resCallBack(err, countObj, data, res);
+                    });
+
+                });
+            }
+        })
+    }
+})
+
+// 函数处理部分
+function resCallBack(err, countObj, dataArr, res) {
+
+    if (err) {
+        countObj.tatol = countObj.tatol + 1;
+        countObj.error = countObj.error + 1;
+        if (countObj.tatol === dataArr.length) {
+            callBack(dataArr.length, countObj.success, countObj.error, res)
+        }
+
+    } else {
+        countObj.tatol = countObj.tatol + 1;
+        countObj.success = countObj.success + 1;
+        if (countObj.tatol === dataArr.length) {
+            callBack(dataArr.length, countObj.success, countObj.error, res)
+        };
+    }
+    // console.log(countObj, dataArr.length);
+}
+
+function callBack(tatol, success, error, res) {
+    if (tatol === success) {
+        res.json({ tatol, success, error, result: true, code: 200 });
+    } else {
+        res.json({ tatol, success, error, result: false, code: 500 });
+    }
+}
 module.exports = router;

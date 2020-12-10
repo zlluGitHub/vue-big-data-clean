@@ -72,6 +72,7 @@ export default {
       columnList: [],
     };
   },
+  props: ["optionList"],
   // model: {
   //   event: "change",
   // },
@@ -140,7 +141,11 @@ export default {
     let { columnsCopy } = this.dataState;
     this.columnList = columnsCopy;
   },
-
+  mounted() {
+    if (this.optionList) {
+      this.columnTypeList = this.optionList;
+    }
+  },
   methods: {
     handleClear(mark) {
       let { columns } = this.dataState;

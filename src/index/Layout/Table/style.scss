@@ -58,22 +58,33 @@
                 font-weight: 500;
                 border-bottom: 1px solid rgba(36, 41, 46, 0.04);
                 border-right: 1px solid rgba(36, 41, 46, 0.04);
-                .zl-text{
+                .zl-text {
                     padding: 3px 6px;
                     white-space: nowrap;
                     text-overflow: ellipsis;
                     overflow: hidden;
                     word-break: break-all;
                     cursor: pointer;
-                    &:hover{
+                    &:hover {
                         background: #eaf6ff;
-
                     }
                 }
             }
         }
         .is-row {
             display: none;
+        }
+    }
+}
+.preview-warp {
+    td {
+        padding: 0 5px;
+        .zl-preview-text {
+            padding: 3px 6px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            word-break: break-all;
         }
     }
 }

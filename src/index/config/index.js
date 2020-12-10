@@ -3,6 +3,10 @@ export const moduleConfig = {
         title: "数据统计信息",
         type: "data-tatistics",
     },
+    delete:{
+        title: "删除列数据",
+        type: "columns-delete",
+    },
 
     arrAndObj: [
         {
@@ -44,18 +48,45 @@ export const moduleConfig = {
             type: "insert-word",
         },
     ],
-    splitColumn: [
+    format: [
         {
-            title: "以某个定界符拆分",
+            title: "转化为大写",
             type: "word-replace",
         },
         {
-            title: "两个定界符之间拆分",
+            title: "转化为小写",
             type: "insert-replace",
         },
         {
-            title: "根据定界符位置拆分",
+            title: "更改日期格式",
             type: "insert-replace",
         },
-    ]
+        {
+            title: "更改时间格式",
+            type: "insert-replace",
+        },
+        {
+            title: "更改日期时间格式",
+            type: "insert-replace",
+        },
+        {
+            title: "自定义日期时间格式",
+            type: "insert-replace",
+        },
+    ],
+   
+    // splitColumn: [
+    //     {
+    //         title: "以某个定界符拆分",
+    //         type: "word-replace",
+    //     },
+    //     {
+    //         title: "两个定界符之间拆分",
+    //         type: "insert-replace",
+    //     },
+    //     {
+    //         title: "根据定界符位置拆分",
+    //         type: "insert-replace",
+    //     },
+    // ]
 }

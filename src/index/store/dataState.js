@@ -1,5 +1,8 @@
-import { deepClone } from "../utils/index"
+
+
+import { deepClone } from "../utils/index";
 import { reqGetData, reqQualityStatistics, reqKeyStatistics } from "../api"
+
 const state = {
   pageInfo: {
     pageSize: 200,
@@ -114,7 +117,9 @@ const actions = {
         let columns = [];
         if (data.length) {
           for (const key in data[0]) {
-            columns.push(key);
+            if (key!=='_id') {
+                columns.push(key);
+            }
           }
         }
         commit('setFooterInfo', {
@@ -126,7 +131,7 @@ const actions = {
           upId: data[0]._id,
           downId: data[data.length - 1]._id,
         })
-
+ 
         commit('setColumns', columns)
         commit('setColumnsCopy', columns)
         commit('setData', data)
