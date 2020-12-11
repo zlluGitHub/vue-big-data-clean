@@ -99,9 +99,10 @@ export default {
     rangeValue: {
       deep: true,
       handler: function (newV, oldV) {
-        if (newV[0] && newV[0].start) {
-          this.columnArr = this.handleColumnMatch(newV.start, newV.end);
-        }
+        // if (newV[0] && newV[0].start) {
+        //   console.log(newV);
+        this.columnArr = this.handleColumnMatch(newV.start, newV.end);
+        // }
       },
     },
     seniorValue: {
