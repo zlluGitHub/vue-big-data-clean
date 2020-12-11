@@ -19,12 +19,12 @@ app.all('*', (req, res, next) => {
   next();
 });
 
-// app.use(express.static(path.join(__dirname, 'log')))
+app.use(express.static(path.join(__dirname, '../dist')))
 
 app.use('/dataClear', require('./routes'));
 
 // 创建服务
-let port = 8081;
+let port = 8888;
 
 let server = http.createServer(app);
 server.listen(port)
