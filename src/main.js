@@ -10,6 +10,10 @@ import ViewUI from 'view-design';
 import 'view-design/dist/styles/iview.css';
 Vue.use(ViewUI);
 
+import moment from 'moment';//导入文件
+// moment.locale('zh-cn');//需要汉化
+Vue.prototype.$moment = moment;//赋值使用
+
 // //引入axios
 // import axios from 'axios';
 // import qs from 'qs';

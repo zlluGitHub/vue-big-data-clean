@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
+const moment = require('moment');//导入文件
 // const path = require("path");
 const fs = require("fs");
-const dataBase = require("../schema");
+// const dataBase = require("../schema");
 // const dataBase = require("../schema/indexWz");
-// const dataBase = require("../schema/min_cshis");
+const dataBase = require("../schema/min_cshis");
 
 // 获取所有数据
 router.get('/get/data', (req, res, next) => {
@@ -228,7 +229,7 @@ router.post('/update/data', (req, res, next) => {
                                     obj[key] = obj[key].replace(new RegExp(repObj.source, 'gi'), repObj.target)
                                 });
                             })
-                            dataBase.updateMany({ _id: item._id }, { $set: obj }, (err, data) => {
+                            dataBase.updateOne({ _id: item._id }, { $set: obj }, (err, data) => {
                                 if (err) {
                                     countObj.tatol = countObj.tatol + 1;
                                     countObj.error = countObj.error + 1;
@@ -295,7 +296,7 @@ router.post('/delete/data', (req, res, next) => {
                         };
                     });
                     // console.log(obj);
-                    dataBase.updateMany({ _id: item._id }, { $unset: obj }, (err) => {
+                    dataBase.updateOne({ _id: item._id }, { $unset: obj }, (err) => {
                         resCallBack(err, countObj, data, res);
                     });
                 });
@@ -355,7 +356,7 @@ router.post('/delete/data', (req, res, next) => {
                                 obj[key] = obj[key].replace(new RegExp(repObj, 'gi'), "")
                             });
                         })
-                        dataBase.updateMany({ _id: item._id }, { $set: obj }, (err, data) => {
+                        dataBase.updateOne({ _id: item._id }, { $set: obj }, (err, data) => {
                             if (err) {
                                 countObj.tatol = countObj.tatol + 1;
                                 countObj.error = countObj.error + 1;
@@ -427,7 +428,7 @@ router.post('/insert/data', (req, res, next) => {
                         columnArr.forEach(key => {
                             obj[key] = insertWord + item[key];
                         })
-                        dataBase.updateMany({ _id: item._id }, { $set: obj }, (err) => {
+                        dataBase.updateOne({ _id: item._id }, { $set: obj }, (err) => {
                             resCallBack(err, countObj, data, res);
                         });
                     })
@@ -446,7 +447,7 @@ router.post('/insert/data', (req, res, next) => {
                         columnArr.forEach(key => {
                             obj[key] = item[key] + insertWord
                         })
-                        dataBase.updateMany({ _id: item._id }, { $set: obj }, (err) => {
+                        dataBase.updateOne({ _id: item._id }, { $set: obj }, (err) => {
                             resCallBack(err, countObj, data, res);
                         });
                     });
@@ -467,7 +468,7 @@ router.post('/insert/data', (req, res, next) => {
                                 insertWord +
                                 item[key].slice(insertWordObj.after, item[key].length);
                         })
-                        dataBase.updateMany({ _id: item._id }, { $set: obj }, (err) => {
+                        dataBase.updateOne({ _id: item._id }, { $set: obj }, (err) => {
                             resCallBack(err, countObj, data, res);
                         });
                     });
@@ -504,7 +505,7 @@ router.post('/insert/data', (req, res, next) => {
                     columnArr.forEach(key => {
                         obj[key] = item[key].replace(new RegExp(insertWordObj.front + insertWordObj.after, 'gi'), insertWordObj.front + insertWord + insertWordObj.after)
                     })
-                    dataBase.updateMany({ _id: item._id }, { $set: obj }, (err, data) => {
+                    dataBase.updateOne({ _id: item._id }, { $set: obj }, (err, data) => {
                         resCallBack(err, countObj, dataArr, res);
                     });
                 });
@@ -557,7 +558,7 @@ router.post('/add/data', (req, res, next) => {
                     });
                     itemObj[columnName] = JSON.stringify(newArr)
 
-                    dataBase.updateMany({ _id: item._id }, { $set: itemObj }, (err) => {
+                    dataBase.updateOne({ _id: item._id }, { $set: itemObj }, (err) => {
                         resCallBack(err, countObj, data, res);
                     });
 
@@ -585,7 +586,7 @@ router.post('/add/data', (req, res, next) => {
                     });
                     itemObj[columnName] = JSON.stringify(newObj)
 
-                    dataBase.updateMany({ _id: item._id }, { $set: itemObj }, (err) => {
+                    dataBase.updateOne({ _id: item._id }, { $set: itemObj }, (err) => {
                         resCallBack(err, countObj, data, res);
                     });
 
@@ -593,6 +594,83 @@ router.post('/add/data', (req, res, next) => {
             }
         })
     }
+})
+
+// 将字符转化成小写
+router.post('/toLowerCase/data', (req, res, next) => {
+    let { columnArr } = req.body;
+    let countObj = {
+        tatol: 0, success: 0, error: 0
+    };
+    dataBase.find({}, (err, data) => {
+        if (err) {
+            console.log(err);
+        } else {
+            data = JSON.parse(JSON.stringify(data));
+            data.forEach(item => {
+                let obj = {}
+                columnArr.forEach(key => {
+                    obj[key] = item[key].toLowerCase()
+                })
+                dataBase.updateOne({ _id: item._id }, { $set: obj }, (err) => {
+                    resCallBack(err, countObj, data, res);
+                });
+            });
+        }
+    })
+})
+
+// 将字符转化成大写
+router.post('/toUpperCase/data', (req, res, next) => {
+    let { columnArr } = req.body;
+    let countObj = {
+        tatol: 0, success: 0, error: 0
+    };
+    dataBase.find({}, (err, data) => {
+        if (err) {
+            console.log(err);
+        } else {
+            data = JSON.parse(JSON.stringify(data));
+            data.forEach(item => {
+                let obj = {}
+                columnArr.forEach(key => {
+                    obj[key] = item[key].toUpperCase()
+                })
+                dataBase.updateOne({ _id: item._id }, { $set: obj }, (err) => {
+                    resCallBack(err, countObj, data, res);
+                });
+            });
+        }
+    })
+})
+
+// 日期时间格式转化
+router.post('/dateTimeFormat/data', (req, res, next) => {
+    let { columnArr, formatType } = req.body;
+    let countObj = {
+        tatol: 0, success: 0, error: 0
+    };
+    dataBase.find({}, (err, data) => {
+        if (err) {
+            console.log(err);
+        } else {
+            data = JSON.parse(JSON.stringify(data));
+            data.forEach(item => {
+                let obj = {}
+                columnArr.forEach(key => {
+                   let newText = moment(item[key]).format(formatType);
+                    if (newText !== 'Invalid date') {
+                        obj[key] = newText;
+                    } else {
+                        obj[key] = item[key]
+                    }
+                })
+                dataBase.updateOne({ _id: item._id }, { $set: obj }, (err) => {
+                    resCallBack(err, countObj, data, res);
+                });
+            });
+        }
+    })
 })
 
 // 函数处理部分

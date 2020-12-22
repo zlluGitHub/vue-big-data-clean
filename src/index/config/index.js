@@ -51,28 +51,28 @@ export const moduleConfig = {
     format: [
         {
             title: "转化为大写",
-            type: "word-replace",
+            type: "to-upper-case",
         },
         {
             title: "转化为小写",
-            type: "insert-replace",
-        },
-        {
-            title: "更改日期格式",
-            type: "insert-replace",
-        },
-        {
-            title: "更改时间格式",
-            type: "insert-replace",
+            type: "to-lower-case",
         },
         {
             title: "更改日期时间格式",
-            type: "insert-replace",
+            type: "date-time-format",
         },
-        {
-            title: "自定义日期时间格式",
-            type: "insert-replace",
-        },
+        // {
+        //     title: "更改时间格式",
+        //     type: "insert-replace",
+        // },
+        // {
+        //     title: "更改日期时间格式",
+        //     type: "insert-replace",
+        // },
+        // {
+        //     title: "自定义日期时间格式",
+        //     type: "insert-replace",
+        // },
     ],
    
     // splitColumn: [

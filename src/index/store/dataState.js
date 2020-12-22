@@ -24,7 +24,10 @@ const state = {
   columns: [],
   columnsCopy: [],
 
-  stepDataArr: [],
+  moduleCache: {
+    module:{},
+    param:{}
+  },
 
   previewData: {
     columns: [],
@@ -57,8 +60,8 @@ const mutations = {
   setCopyData(state, data) {
     state.copyData = deepClone(data);
   },
-  setStepDataArr(state, data) {
-    state.stepDataArr.push(data);
+  setModuleCache(state, data) {
+    state.moduleCache.push(data);
   },
   setData(state, data) {
     state.data = deepClone(data);

@@ -51,10 +51,36 @@ export function reqInsert(data) {
         data
     })
 }
+
 // 添加数据内容
 export function reqAdd(data) {
     return request({
         url: '/dataClear/add/data',
+        method: 'post',
+        data
+    })
+}
+// 将字符转化成小写
+export function reqToLowerCase(data) {
+    return request({
+        url: '/dataClear/toLowerCase/data',
+        method: 'post',
+        data
+    })
+}
+
+// 将字符转化成大写
+export function reqToUpperCase(data) {
+    return request({
+        url: '/dataClear/toUpperCase/data',
+        method: 'post',
+        data
+    })
+}
+// 日期时间格式转化
+export function reqDateTimeFormat(data) {
+    return request({
+        url: '/dataClear/dateTimeFormat/data',
         method: 'post',
         data
     })

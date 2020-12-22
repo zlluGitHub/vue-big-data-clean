@@ -51,6 +51,27 @@
     >
       <DeleteColumns :moduleObj="moduleObj" />
     </div>
+    <div
+      v-else-if="moduleObj.type === 'to-lower-case'"
+      class="zl-drawer-item"
+      :style="style"
+    >
+      <ToLowerCase :moduleObj="moduleObj" />
+    </div>
+    <div
+      v-else-if="moduleObj.type === 'to-upper-case'"
+      class="zl-drawer-item"
+      :style="style"
+    >
+      <ToUpperCase :moduleObj="moduleObj" />
+    </div>
+    <div
+      v-else-if="moduleObj.type === 'date-time-format'"
+      class="zl-drawer-item"
+      :style="style"
+    >
+      <DateFormat :moduleObj="moduleObj" />
+    </div>
     <div v-else></div>
     <!-- </transition> -->
   </div>
@@ -63,6 +84,9 @@ import InsertWord from "../../Modules/InsertWord";
 import ColumnsIntoArray from "../../Modules/ColumnsIntoArray";
 import ColumnsIntoObj from "../../Modules/ColumnsIntoObj";
 import DeleteColumns from "../../Modules/DeleteColumns";
+import ToLowerCase from "../../Modules/ToLowerCase";
+import ToUpperCase from "../../Modules/ToUpperCase";
+import DateFormat from "../../Modules/DateFormat";
 export default {
   components: {
     DataStatistics,
@@ -72,6 +96,9 @@ export default {
     ColumnsIntoArray,
     ColumnsIntoObj,
     DeleteColumns,
+    ToLowerCase,
+    ToUpperCase,
+    DateFormat
   },
   data() {
     return {
@@ -102,6 +129,7 @@ export default {
     onMenuType(item) {
       this.$store.commit("setPreviewData", {});
       this.moduleObj = item;
+      console.log(item);
     },
     handleClose() {
       this.$emit("on-close", false);

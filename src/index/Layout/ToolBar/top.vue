@@ -40,7 +40,7 @@
             </ol>
           </transition>
         </li>
-        <!-- <li>
+        <li>
           <div @click="handleMenuSwitch('format')">
             <img src="../../assets/a.svg" />
             <img src="../../assets/xxjt.svg" class="arrow-icon" />
@@ -56,7 +56,7 @@
               </li>
             </ol>
           </transition>
-        </li> -->
+        </li>
         <li>
           <div @click="handleMenuSwitch('delete')">
             <img

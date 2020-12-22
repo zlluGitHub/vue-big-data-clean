@@ -1,4 +1,6 @@
 import Vue from 'vue';
+import moment from 'moment';//导入文件
+// moment.locale('zh-cn');//需要汉化
 
 Vue.prototype.$saveData = function (columns, data) {
     columns = columns.filter(item => {
@@ -274,7 +276,60 @@ export const deleteColumns = (newData, columnArr, mark) => {
             value: key,
         })
     }
-    console.log(columns);
+    // console.log(columns);
     return { columns, tableData: newData }
 
+}
+
+export const toLowerCase = (newData, columnArr, mark) => {
+    newData.forEach((item, i) => {
+        columnArr.forEach((key, index) => {
+            let newText = item[key].toLowerCase();
+            if (newText !== item[key]) {
+                if (mark === 'view') {
+                    item[key] = `<span class="del-highlight">${item[key]}</span><span class="rep-highlight">${newText}</span>`
+                    console.log(item[key]);
+                } else {
+                    item[key] = newText
+                }
+            };
+        });
+    });
+    return newData;
+}
+
+export const toUpperCase = (newData, columnArr, mark) => {
+    newData.forEach((item, i) => {
+        columnArr.forEach((key, index) => {
+            let newText = item[key].toUpperCase();
+            if (newText !== item[key]) {
+                if (mark === 'view') {
+                    item[key] = `<span class="del-highlight">${item[key]}</span><span class="rep-highlight">${newText}</span>`
+                } else {
+                    item[key] = newText
+                }
+            };
+        });
+    });
+    return newData;
+}
+
+export const dateTimeFormat = (newData, option, mark) => {
+    let { columnArr, formatType } = option;
+    if (formatType) {
+        newData.forEach((item, i) => {
+            columnArr.forEach((key, index) => {
+                let newText = moment(item[key]).format(formatType);
+                console.log(newText);
+                if (newText !== 'Invalid date') {
+                    if (mark === 'view') {
+                        item[key] = `<span class="del-highlight">${item[key]}</span><span class="rep-highlight">${newText}</span>`
+                    } else {
+                        item[key] = newText
+                    }
+                };
+            });
+        });
+    }
+    return newData;
 }

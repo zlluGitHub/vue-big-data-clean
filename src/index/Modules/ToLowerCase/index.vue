@@ -1,0 +1,103 @@
+<template>
+  <div class="drawer-box">
+    <ul>
+      <li>
+        <div class="title">选择需要转换的列</div>
+        <div class="content">
+          <SelectColumn
+            @on-change="handleOnChangeSelectColumn"
+            :optionList="optionList"
+            ref="selectColumn"
+          />
+        </div>
+      </li>
+    </ul>
+    <div class="button-warp">
+      <Button @click="handleOKOrCancel(false)">取消</Button>
+      <Button type="primary" @click="handleOKOrCancel('ok')">确定</Button>
+    </div>
+  </div>
+</template>
+<script>
+import { deepClone } from "../../utils";
+import { reqToLowerCase } from "../../api";
+import SelectColumn from "../../components/SelectColumn/index";
+import { toLowerCase } from "../../utils/processing";
+export default {
+  components: { SelectColumn },
+  data() {
+    return {
+      dataState: this.$store.state.dataState,
+      columnArr: [],
+    };
+  },
+  props: ["moduleObj"],
+  watch: {
+    columnArr: {
+      // deep: true,
+      handler: function (newV, oldV) {
+        if (newV && newV[0]) {
+          this.handleData(newV, "view");
+        }
+      },
+    },
+  },
+
+  methods: {
+    handleOnChangeSelectColumn(arr) {
+      this.columnArr = arr;
+    },
+    handleClear() {
+      this.$refs.selectColumn.handleClear();
+      let { copyData } = this.dataState;
+      this.$store.commit("setData", deepClone(copyData));
+    },
+    handleOKOrCancel(mark) {
+      if (mark === "ok") {
+        if (this.columnArr.length) {
+          this.$event.emit("loading", true);
+          reqToLowerCase({ columnArr: this.columnArr })
+            .then((res) => {
+              this.$event.emit("loading", false);
+              if (res.data.code === 200) {
+                this.handleData(this.columnArr);
+                this.handleClear();
+                this.$Modal.success({
+                  title: "系统提示",
+                  content: `总共：${res.data.tatol}条，成功：${res.data.success}条，失败：${res.data.error}条`,
+                });
+              } else {
+                this.$Notice.error({
+                  title: "操作失败！",
+                });
+              }
+            })
+            .catch((error) => {
+              this.$event.emit("loading", false);
+              this.$Notice.error({
+                title: "网络异常，请稍后再试！",
+              });
+              console.log(error);
+            });
+        } else {
+          this.$Notice.warning({
+            title: "请输入相关内容后操作！",
+          });
+        }
+      } else {
+        this.handleClear();
+      }
+    },
+    handleData(columnArr, mark) {
+      let { copyData } = this.dataState;
+      let newData = deepClone(copyData);
+      newData = toLowerCase(newData, columnArr, mark);
+      this.$store.commit("setData", newData);
+      if (mark !== "view") {
+        this.$store.commit("setCopyData", newData);
+        // this.$Notice.success({ title: "批量替换成功！" });
+      }
+    },
+  },
+};
+</script>
