@@ -156,6 +156,10 @@ export default {
             .then((res) => {
               this.$event.emit("loading", false);
               if (res.data.code === 200) {
+                // 保存步骤数据
+                this.setModuleStep(true);
+
+                // 处理展示数据
                 this.handleData();
                 this.handleClear();
                 this.$Modal.success({
@@ -194,9 +198,8 @@ export default {
 
     handleData(mark) {
       let { copyData } = this.dataState;
-      let newData = deepClone(copyData);
-      newData = insertWordFun(
-        newData,
+      let dataObj = insertWordFun(
+        deepClone(copyData),
         {
           columnArr: this.columnArr,
           matchRules: this.matchRules,
@@ -205,11 +208,26 @@ export default {
         },
         mark
       );
-      this.$store.commit("setData", newData);
+      this.setModuleStep(false);
+
+      this.$store.commit("setData", dataObj.tableData);
       if (mark !== "view") {
-        this.$store.commit("setCopyData", newData);
+        this.$store.commit("setCopyData", dataObj.tableData);
         // this.$Notice.success({ title: "批量替换成功！" });
       }
+    },
+    setModuleStep(mark) {
+      // 保存步骤数据
+      this.$store.commit("setModuleStep", {
+        module: this.moduleObj,
+        paramObj: {
+          columnArr: this.columnArr,
+          matchRules: this.matchRules,
+          insertWord: this.insertWord,
+          insertWordObj: this.insertWordObj,
+        },
+        isLast: mark,
+      });
     },
   },
 };

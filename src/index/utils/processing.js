@@ -65,7 +65,7 @@ export const dataQualityStatistics = (jsonData) => {
 // 批量替换指定元素
 export const replaceWord = (newData, option, mark) => {
     let { columnArr, characterArr } = option;
-    return newData.map((item, i) => {
+    newData = newData.map((item, i) => {
         columnArr.forEach((key, index) => {
             let text = item[key];
             if (text) {
@@ -87,11 +87,12 @@ export const replaceWord = (newData, option, mark) => {
 
         return item;
     });
+    return { tableData: newData }
 };
 // 批量删除指定元素
 export const deleteWord = (newData, option, mark) => {
     let { columnArr, characterArr } = option;
-    return newData.map((item, i) => {
+    newData = newData.map((item, i) => {
         columnArr.forEach((key, index) => {
             let text = item[key];
             if (text) {
@@ -110,13 +111,14 @@ export const deleteWord = (newData, option, mark) => {
         });
         return item;
     });
+    return { tableData: newData }
 }
 
 // 批量插入指定元素
 export const insertWordFun = (newData, option, mark) => {
     console.log(option);
     let { columnArr, matchRules, insertWord, insertWordObj } = option;
-    return newData.map((item, i) => {
+    newData = newData.map((item, i) => {
         columnArr.forEach((key, index) => {
             let text = item[key];
             if (text) {
@@ -180,6 +182,7 @@ export const insertWordFun = (newData, option, mark) => {
         });
         return item;
     });
+    return { tableData: newData }
 };
 
 export const columnsIntoArray = (newData, option, mark) => {
@@ -256,7 +259,6 @@ export const columnsIntoObj = (newData, option, mark) => {
         newColumns = columns;
     }
     return { columns: newColumns, tableData: newTableData }
-
 }
 
 export const deleteColumns = (newData, columnArr, mark) => {
@@ -295,7 +297,7 @@ export const toLowerCase = (newData, columnArr, mark) => {
             };
         });
     });
-    return newData;
+    return { tableData: newData }
 }
 
 export const toUpperCase = (newData, columnArr, mark) => {
@@ -311,8 +313,8 @@ export const toUpperCase = (newData, columnArr, mark) => {
             };
         });
     });
-    return newData;
-}
+    return { tableData: newData }
+};
 
 export const dateTimeFormat = (newData, option, mark) => {
     let { columnArr, formatType } = option;
@@ -325,11 +327,36 @@ export const dateTimeFormat = (newData, option, mark) => {
                     if (mark === 'view') {
                         item[key] = `<span class="del-highlight">${item[key]}</span><span class="rep-highlight">${newText}</span>`
                     } else {
-                        item[key] = newText
+                        item[key] = newText;
                     }
-                };
+                }else{
+                    item[key] = `<span class="error-highlight">${item[key]}（格式错误）</span>`
+                }
             });
         });
     }
-    return newData;
+    return { tableData: newData }
+};
+
+export const processingModule = (data, itemData, mark) => {
+    let { module, paramObj } = itemData;
+    if (module.type === 'replace-word') {
+        return replaceWord(data, paramObj, mark);
+    } else if (module.type === 'delete-word') {
+        return deleteWord(data, paramObj, mark);
+    } else if (module.type === 'insert-word') {
+        return insertWordFun(data, paramObj, mark);
+    } else if (module.type === 'columns-into-array') {
+        return columnsIntoArray(data, paramObj, mark);
+    } else if (module.type === 'columns-into-object') {
+        return columnsIntoObj(data, paramObj, mark);
+    } else if (module.type === 'columns-delete') {
+        return deleteColumns(data, paramObj, mark);
+    } else if (module.type === 'to-lower-case') {
+        return toLowerCase(data, paramObj, mark);
+    } else if (module.type === 'to-upper-case') {
+        return toUpperCase(data, paramObj, mark);
+    } else if (module.type === 'date-time-format') {
+        return dateTimeFormat(data, paramObj, mark);
+    }
 }

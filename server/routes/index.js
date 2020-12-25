@@ -3,9 +3,9 @@ const router = express.Router();
 const moment = require('moment');//导入文件
 // const path = require("path");
 const fs = require("fs");
-// const dataBase = require("../schema");
+const dataBase = require("../schema");
 // const dataBase = require("../schema/indexWz");
-const dataBase = require("../schema/min_cshis");
+// const dataBase = require("../schema/min_cshis");
 
 // 获取所有数据
 router.get('/get/data', (req, res, next) => {

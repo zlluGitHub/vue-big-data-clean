@@ -153,6 +153,10 @@ export default {
             .then((res) => {
               this.$event.emit("loading", false);
               if (res.data.code === 200) {
+                // 保存步骤数据
+                this.setModuleStep(true);
+
+                // 处理展示数据
                 this.handleData();
                 this.handleClear();
                 this.$Modal.success({
@@ -190,22 +194,38 @@ export default {
     },
     handleData(mark) {
       let { copyData, columnsCopy } = this.dataState;
-      let newData = deepClone(copyData);
-      let formatType =
-        this.formatValue === "自定义日期时间格式" ? this.inputFormat : this.formatValue;
-      newData = dateTimeFormat(
-        newData,
+      let dataObj = dateTimeFormat(
+        deepClone(copyData),
         {
           columnArr: this.columnArr,
-          formatType,
+          formatType:
+            this.formatValue === "自定义日期时间格式"
+              ? this.inputFormat
+              : this.formatValue,
         },
         mark
       );
-      this.$store.commit("setData", newData);
+      // 缓存最后一步操作
+      this.setModuleStep(false);
+
+      this.$store.commit("setData", dataObj.tableData);
       if (mark !== "view") {
-        this.$store.commit("setCopyData", newData);
+        this.$store.commit("setCopyData", dataObj.tableData);
         // this.$Notice.success({ title: "批量替换成功！" });
       }
+    },
+    setModuleStep(mark) {
+      this.$store.commit("setModuleStep", {
+        module: this.moduleObj,
+        paramObj: {
+          columnArr: this.columnArr,
+          formatType:
+            this.formatValue === "自定义日期时间格式"
+              ? this.inputFormat
+              : this.formatValue,
+        },
+        isLast: mark,
+      });
     },
   },
 };

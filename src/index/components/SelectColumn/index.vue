@@ -80,18 +80,8 @@ export default {
     columnArr: {
       // deep: true,
       handler: function (newV, oldV) {
-        // console.log(newV);
         if (newV.length !== 0) {
-          let { columnsCopy } = this.dataState;
-          let newColumnsCopy = deepClone(columnsCopy);
-          newColumnsCopy.forEach((item) => {
-            if (newV.indexOf(item.value) > -1) {
-              item.zl_state = "source";
-            } else {
-              item.zl_state = "";
-            }
-          });
-          this.$store.commit("setColumns", newColumnsCopy);
+          this.$store.commit("setSelectColumns", newV);
           this.$emit("on-change", newV);
         }
       },

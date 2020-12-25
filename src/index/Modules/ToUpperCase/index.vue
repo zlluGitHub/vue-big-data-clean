@@ -47,7 +47,7 @@ export default {
     handleOnChangeSelectColumn(arr) {
       this.columnArr = arr;
     },
-      handleClear() {
+    handleClear() {
       this.$refs.selectColumn.handleClear();
       let { copyData } = this.dataState;
       this.$store.commit("setData", deepClone(copyData));
@@ -60,6 +60,9 @@ export default {
             .then((res) => {
               this.$event.emit("loading", false);
               if (res.data.code === 200) {
+                // 保存步骤数据
+                this.setModuleStep(true);
+                // 处理展示数据
                 this.handleData(this.columnArr);
                 this.handleClear();
                 this.$Modal.success({
@@ -90,14 +93,21 @@ export default {
     },
     handleData(columnArr, mark) {
       let { copyData } = this.dataState;
-      let newData = deepClone(copyData);
-      newData = toUpperCase(newData, columnArr, mark);
-      this.$store.commit("setData", newData);
+      let dataObj = toUpperCase(deepClone(copyData), columnArr, mark);
+      this.setModuleStep(false);
+      this.$store.commit("setData", dataObj.tableData);
       if (mark !== "view") {
-        this.$store.commit("setCopyData", newData);
+        this.$store.commit("setCopyData", dataObj.tableData);
         // this.$Notice.success({ title: "批量替换成功！" });
       }
-    }
+    },
+    setModuleStep(mark) {
+      this.$store.commit("setModuleStep", {
+        module: this.moduleObj,
+        paramObj: this.columnArr,
+        isLast: mark,
+      });
+    },
   },
 };
 </script>

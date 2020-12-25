@@ -142,9 +142,10 @@ export default {
         this.$store.dispatch("reqGetData", {
           pageNo: 1,
           pageSize: 200 * pageNo,
-          callBack: () => {
+          callBack: (data) => {
             pageNo = pageNo + 1;
-            isLoading = true;
+            console.log(data.count ,this.tableData.length);
+            isLoading = data.count !== this.tableData.length;
           },
         });
       }
@@ -178,9 +179,10 @@ export default {
       this.$refs.indexTable.handleClearClick();
     },
     onDrawerClose() {
-      this.$store.commit("setColumns", this.$store.state.dataState.columnsCopy);
       this.isOpenDrawer = false;
       this.$store.commit("setPreviewData", []);
+      this.$store.commit("setLastStepObj", {});
+      this.$store.commit("setSelectColumns", []);
 
       let time = setTimeout(() => {
         this.$event.emit("menu-type", {

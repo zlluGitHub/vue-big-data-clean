@@ -1,8 +1,8 @@
 
 
 import { deepClone } from "../utils/index";
-import { reqGetData, reqQualityStatistics, reqKeyStatistics } from "../api"
-
+import { reqGetData, reqQualityStatistics, reqKeyStatistics } from "../api";
+import { processingModule } from "../utils/processing";
 const state = {
   pageInfo: {
     pageSize: 200,
@@ -23,10 +23,17 @@ const state = {
 
   columns: [],
   columnsCopy: [],
+  selectColumns: [],
 
-  moduleCache: {
-    module:{},
-    param:{}
+  moduleStep: [
+    // {
+    //   module: {},
+    //   paramObj: {}
+    // }
+  ],
+  lastStepObj: {
+    module: {},
+    paramObj: {}
   },
 
   previewData: {
@@ -60,10 +67,27 @@ const mutations = {
   setCopyData(state, data) {
     state.copyData = deepClone(data);
   },
-  setModuleCache(state, data) {
-    state.moduleCache.push(data);
+  setModuleStep(state, data) {
+    console.log(data, 'asdasdasdasd');
+    if (data.isLast) {
+      state.moduleStep.push({
+        module: data.module,
+        paramObj: data.paramObj
+      });
+    } else {
+      state.lastStepObj = {
+        module: data.module,
+        paramObj: data.paramObj
+      };
+      // console.log(state.lastStepObj,'aaaa');
+    }
+    // console.log(state.moduleStep);
+  },
+  setLastStepObj(state, data) {
+    state.lastStepObj = data;
   },
   setData(state, data) {
+    // console.log(state);
     state.data = deepClone(data);
   },
   setColumns(state, data) {
@@ -100,6 +124,22 @@ const mutations = {
       state.columnsCopy = []
     }
   },
+
+  setSelectColumns(state, data) {
+    state.selectColumns = data;
+    if (data && data.length) {
+      let newColumns = state.columnsCopy.map((item) => {
+        if (data.indexOf(item.value) > -1) {
+          return { ...item, ...{ zl_state: "source" } };
+        } else {
+          return item;
+        }
+      });
+      mutations.setColumns(state, newColumns);
+    } else {
+      mutations.setColumns(state, state.columnsCopy);
+    }
+  },
   setPreviewData(state, data) {
     state.previewData = data;
   },
@@ -116,29 +156,66 @@ const actions = {
     reqGetData({ pageSize, pageNo, page_id, _id, bid }).then((res) => {
       if (res.data.code === 200 || res.data.code === "200") {
         // console.log(res.data);
-        let data = res.data.data
-        let columns = [];
+        let data = res.data.data;
+        let columnsCopy = [];
+        commit('setData', data)
+        commit('setCopyData', data);
         if (data.length) {
           for (const key in data[0]) {
-            if (key!=='_id') {
-                columns.push(key);
-            }
-          }
-        }
+            if (key !== '_id') {
+              columnsCopy.push(key);
+            };
+          };
+        };
+
+        commit('setColumnsCopy', deepClone(columnsCopy));
+
+        // // 分页加载处理
+        // if (state.moduleStep.length !== 0) {
+        //   let promise = Promise.resolve(deepClone(data));
+        //   state.moduleStep.forEach(itemStep => {
+        //     promise = promise.then((newData) => {
+        //       return new Promise(resolve => {
+        //         let { tableData } = processingModule(newData, itemStep)
+        //         resolve(tableData);
+        //       });
+        //     });
+        //   })
+        //   promise.then((newData) => {
+        //     if (state.lastStepObj.isLast) {
+        //       commit('setData', processingModule(newData, state.lastStepObj, 'view'))
+        //     } else {
+        //       commit('setData', newData)
+        //     };
+        //   });
+        // } else {
+        let lastStepObj = state.lastStepObj
+        if (JSON.stringify(lastStepObj.module) !== "{}") {
+          let { tableData, columns } = processingModule(deepClone(data), state.lastStepObj, 'view');
+          if (lastStepObj.module.type === 'columns-into-array' || lastStepObj.module.type === 'columns-into-object') {
+            commit("setPreviewData", { tableData, columns });
+          } else {
+            commit('setData', tableData)
+            columnsCopy = columns ? columns : columnsCopy;
+          };
+        };
+        // };
+
+        commit('setColumns', columnsCopy)
+
+        if (state.selectColumns.length) {
+          commit("setSelectColumns", state.selectColumns);
+        };
+
         commit('setFooterInfo', {
-          column: columns.length,
+          column: columnsCopy.length,
           row: res.data.count
-        })
+        });
 
         commit('setPageInfo', {
           upId: data[0]._id,
           downId: data[data.length - 1]._id,
-        })
- 
-        commit('setColumns', columns)
-        commit('setColumnsCopy', columns)
-        commit('setData', data)
-        commit('setCopyData', data)
+        });
       }
       callBack(res.data);
     }).catch(error => {

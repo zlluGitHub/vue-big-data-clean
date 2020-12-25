@@ -62,6 +62,13 @@ $border-radius: 1px;
     border-radius: $border-radius;
     margin: 0 1px;
 }
+.error-highlight {
+    // background: rgba(25, 190, 107, 0.7);
+    color:red;
+    // padding: 1px 3px;
+    // border-radius: $border-radius;
+    // margin: 0 1px;
+}
 
 .rep-highlight {
     background: rgba(25, 190, 107, 0.7);
