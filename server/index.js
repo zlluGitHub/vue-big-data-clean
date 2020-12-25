@@ -34,7 +34,7 @@ server.on('error', function () {
 server.on('listening', function () {
   console.log("server listening at http://localhost:" + port);
 });
-mongoose.connect(`mongodb://10.0.88.46:27017/test`, { useNewUrlParser: true, useUnifiedTopology: true }, err => {
+mongoose.connect(`mongodb://127.0.0.1:27017/test`, { useNewUrlParser: true, useUnifiedTopology: true }, err => {
   if (err) {
     console.log('Connection Error:' + err);
   } else {
