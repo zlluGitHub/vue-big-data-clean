@@ -29,7 +29,6 @@ Vue.config.productionTip = false
 
 //实例化 store
 import store from './index/store'; // this.$store.commit("setUser", user); 
-
 //引入路由文件
 import router from './router';
 //// 路由拦截
@@ -53,8 +52,9 @@ import router from './router';
 //   }
 // });
 
-new Vue({
+export default new Vue({
   router,
   store,
   render: h => h(App),
 }).$mount('#app')
+

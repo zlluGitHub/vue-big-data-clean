@@ -63,7 +63,7 @@ export default {
           label: "高级选择",
         },
       ],
-
+      isSetSelectState: true,
       rangeValue: {
         start: "",
         end: "",
@@ -72,16 +72,30 @@ export default {
       columnList: [],
     };
   },
-  props: ["optionList"],
+  props: ["optionList", "isSetSelectColumns"],
   // model: {
   //   event: "change",
   // },
   watch: {
+    isSetSelectColumns: {
+      handler(newVal, oldVal) {
+        this.isSetSelectState = newVal;
+      },
+      immediate: true,
+    },
     columnArr: {
       // deep: true,
       handler: function (newV, oldV) {
         if (newV.length !== 0) {
-          this.$store.commit("setSelectColumns", newV);
+          if (this.isSetSelectState) {
+            this.$store.commit(
+              "setSelectColumns",
+              newV.map((key) => {
+                return { state: "source", key };
+              })
+            );
+          }
+
           this.$emit("on-change", newV);
         }
       },
@@ -96,7 +110,7 @@ export default {
       },
     },
     seniorValue: {
-      deep: true,
+      // deep: true,
       handler: function (newV, oldV) {
         if (newV) {
           let columnArr = [];

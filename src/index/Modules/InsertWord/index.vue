@@ -4,7 +4,11 @@
       <li>
         <div class="title">选择列（可多选）</div>
         <div class="content">
-          <SelectColumn @on-change="handleOnChangeSelectColumn" ref="selectColumn" />
+          <SelectColumn
+            @on-change="handleOnChangeSelectColumn"
+            ref="selectColumn"
+            :isSetSelectColumns="true"
+          />
         </div>
       </li>
       <li>

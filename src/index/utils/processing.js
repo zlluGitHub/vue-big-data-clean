@@ -1,16 +1,17 @@
 import Vue from 'vue';
 import moment from 'moment';//导入文件
-// moment.locale('zh-cn');//需要汉化
-
+import store from "../store";
+// export let storeData = {};
 Vue.prototype.$saveData = function (columns, data) {
-    columns = columns.filter(item => {
-        return item !== '_id'
-    })
+    // columns = columns.filter(item => {
+    //     return item !== '_id'
+    // })
     this.$store.commit("setData", data);
     this.$store.commit("setColumns", columns);
     this.$store.commit("setColumnsCopy", columns);
     this.$store.commit("setCopyData", data);
 }
+
 
 // 数据质量统计
 export const dataQualityStatistics = (jsonData) => {
@@ -265,9 +266,7 @@ export const deleteColumns = (newData, columnArr, mark) => {
 
     newData.forEach((item, i) => {
         columnArr.forEach((key, index) => {
-            if (item[key]) {
-                delete item[key];
-            };
+            delete item[key];
         });
     });
 
@@ -329,13 +328,177 @@ export const dateTimeFormat = (newData, option, mark) => {
                     } else {
                         item[key] = newText;
                     }
-                }else{
+                } else {
                     item[key] = `<span class="error-highlight">${item[key]}（格式错误）</span>`
                 }
             });
         });
     }
     return { tableData: newData }
+};
+
+export const splitPosition = (newData, option, mark) => {
+    let { columnArr, positionArr, isNotSplit } = option;
+    let columns = [];
+    if (positionArr[0] && columnArr[0]) {
+        positionArr = positionArr.map(number => number * 1);
+        positionArr.sort((a, b) => a - b);
+        newData = newData.map((item, i) => {
+            let obj = {};
+            columnArr.forEach((key, index) => {
+                let newText = item[key];
+                let textArr = [newText.slice(0, positionArr[0])];
+                // newText
+                for (let index = 0; index < positionArr.length; index++) {
+                    textArr.push(newText.slice(positionArr[index], positionArr[index + 1]));
+                }
+                for (const ik in item) {
+                    if (ik === key) {
+                        textArr.forEach((text, n) => {
+                            obj[key + `_${n + 1}`] = text;
+                            if (columns.indexOf(key + `_${n + 1}`) <= -1) {
+                                columns.push(key + `_${n + 1}`)
+                            }
+                        })
+                    }
+                }
+            });
+
+            obj = { ...obj, ...item };
+            if (isNotSplit === 'no') {
+                for (const ik in item) {
+                    if (columnArr.indexOf(ik) > -1) {
+                        delete obj[ik]
+                    }
+                }
+            }
+            return obj;
+        });
+        // }
+
+        // let dataColumns = Object.keys(newData[0]);
+        let columnsCopy = store.state.dataState.columnsCopy;
+        columnsCopy = columnsCopy.map(item => item.value);
+        columns = Array.from(new Set([...columns, ...columnsCopy]));
+
+        if (mark === 'view') {
+            columns = columns.sort((a, b) => a.localeCompare(b));
+            columns = columns.map(key => {
+                return {
+                    label: key,
+                    value: key
+                }
+            });
+            columnArr.forEach(key => {
+                columns.forEach(each => {
+                    if (each.label.indexOf(key + '_') > -1) {
+                        each.zl_state = 'target';
+                    } else if (each.label.indexOf(key) > -1) {
+                        each.zl_state = 'source';
+                    }
+                })
+            });
+        }
+    } else {
+        // for (const key in newData[0]) {
+        //     columns.push({
+        //         label: key,
+        //         value: key
+        //     })
+        // }
+        columns = store.state.dataState.columnsCopy;
+        columnArr.forEach(key => {
+            columns.forEach(each => {
+                if (each.label.indexOf(key) > -1) {
+                    each.zl_state = 'source';
+                }
+            })
+        });
+    }
+    return { columns, tableData: newData }
+};
+
+export const splitWord = (newData, option, mark) => {
+    let { columnArr, positionArr, isNotSplit } = option;
+    let columns = [];
+    // console.log();
+    if (positionArr[0] && columnArr[0]) {
+        positionArr = positionArr.map(item => item.toString());
+        // positionArr.sort((a, b) => a - b);
+        newData = newData.map((item, i) => {
+            let obj = {};
+            columnArr.forEach((key, index) => {
+                let newText = item[key];
+                // let textArr = [newText.slice(0, positionArr[0])];
+                // // newText
+
+                let textArr = []
+                for (let index = 0; index < positionArr.length; index++) {
+                    textArr = newText.split(new RegExp(positionArr[index], 'gi'));
+                    // textArr.push(newText.slice(positionArr[index], positionArr[index + 1]));
+                }
+                for (const ik in item) {
+                    if (ik === key) {
+                        textArr.forEach((text, n) => {
+                            obj[key + `_${n + 1}`] = text;
+                            if (columns.indexOf(key + `_${n + 1}`) <= -1) {
+                                columns.push(key + `_${n + 1}`)
+                            }
+                        })
+                    }
+                }
+            });
+            obj = { ...obj, ...item };
+            if (isNotSplit === 'no') {
+                for (const ik in item) {
+                    if (columnArr.indexOf(ik) > -1) {
+                        delete obj[ik]
+                    }
+                }
+            }
+            return obj;
+        });
+        // }
+
+        let columnsCopy = store.state.dataState.columnsCopy;
+        columnsCopy = columnsCopy.map(item => item.value);
+        columns = Array.from(new Set([...columns, ...columnsCopy]));
+
+        if (mark === 'view') {
+            columns.sort((a, b) => a.localeCompare(b));
+            columns = columns.map(key => {
+                return {
+                    label: key,
+                    value: key
+                }
+            });
+            columnArr.forEach(key => {
+                columns.forEach(each => {
+                    if (each.label.indexOf(key + '_') > -1) {
+                        each.zl_state = 'target';
+                    } else if (each.label.indexOf(key) > -1) {
+                        each.zl_state = 'source';
+                    }
+                })
+            });
+        }
+    } else {
+        columns = store.state.dataState.columnsCopy;
+        // for (const key in newData[0]) {
+        //     columns.push({
+        //         label: key,
+        //         value: key
+        //     })
+        // }
+        columnArr.forEach(key => {
+            columns.forEach(each => {
+                if (each.label.indexOf(key) > -1) {
+                    each.zl_state = 'source';
+                }
+            })
+        });
+    }
+    return { columns, tableData: newData }
 };
 
 export const processingModule = (data, itemData, mark) => {
@@ -358,5 +521,9 @@ export const processingModule = (data, itemData, mark) => {
         return toUpperCase(data, paramObj, mark);
     } else if (module.type === 'date-time-format') {
         return dateTimeFormat(data, paramObj, mark);
+    } else if (module.type === 'split-position') {
+        return splitPosition(data, paramObj, mark);
+    } else if (module.type === 'split-word') {
+        return splitWord(data, paramObj, mark);
     }
 }

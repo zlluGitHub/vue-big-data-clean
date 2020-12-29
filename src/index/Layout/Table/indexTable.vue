@@ -9,6 +9,7 @@
             'column-header',
             'column-header-' + i === selectClass.header ? 'source-header' : null,
             item.zl_state === 'source' ? 'select-header' : null,
+            item.zl_state === 'target' ? 'preview-header' : null,
             !order ? 'preview' : null,
           ]"
           @click.stop="
@@ -37,6 +38,7 @@
             'row',
             'row-' + n === selectClass.row ? 'source' : null,
             each.zl_state === 'source' ? 'select' : null,
+            each.zl_state === 'target' ? 'preview' : null,
             m + '-' + n,
             !order ? 'preview' : null,
           ]"

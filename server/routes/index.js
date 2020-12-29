@@ -291,9 +291,7 @@ router.post('/delete/data', (req, res, next) => {
                     let obj = {}
 
                     columns.forEach(key => {
-                        if (item[key]) {
-                            obj[key] = item[key];
-                        };
+                            obj[key] = "";
                     });
                     // console.log(obj);
                     dataBase.updateOne({ _id: item._id }, { $unset: obj }, (err) => {
@@ -658,7 +656,7 @@ router.post('/dateTimeFormat/data', (req, res, next) => {
             data.forEach(item => {
                 let obj = {}
                 columnArr.forEach(key => {
-                   let newText = moment(item[key]).format(formatType);
+                    let newText = moment(item[key]).format(formatType);
                     if (newText !== 'Invalid date') {
                         obj[key] = newText;
                     } else {
@@ -669,6 +667,94 @@ router.post('/dateTimeFormat/data', (req, res, next) => {
                     resCallBack(err, countObj, data, res);
                 });
             });
+        }
+    })
+})
+
+// 根据字符位置拆分
+router.post('/splitPosition/data', (req, res, next) => {
+    let { columnArr, positionArr, isNotSplit } = req.body;
+    let countObj = {
+        tatol: 0, success: 0, error: 0
+    };
+    dataBase.find({}, (err, data) => {
+        if (err) {
+            console.log(err);
+        } else {
+            data = JSON.parse(JSON.stringify(data));
+
+            data.forEach((item, i) => {
+                let obj = {};
+                let unsetObj = {};
+                columnArr.forEach((key, index) => {
+                    if (isNotSplit === 'no') {
+                        unsetObj[key] = "";
+                    }
+                    let newText = item[key];
+                    let textArr = [newText.slice(0, positionArr[0])];
+                    // newText
+                    for (let index = 0; index < positionArr.length; index++) {
+                        textArr.push(newText.slice(positionArr[index], positionArr[index + 1]));
+                    }
+                    for (const ik in item) {
+                        if (ik === key) {
+                            textArr.forEach((text, n) => {
+                                obj[key + `_${n + 1}`] = text;
+                            })
+                        }
+                    }
+                });
+
+                dataBase.updateOne({ _id: item._id }, { $set: obj, $unset: unsetObj }, (err) => {
+                    resCallBack(err, countObj, data, res);
+                });
+
+            });
+
+        }
+    })
+})
+// 根据字符或字符串拆分
+router.post('/splitWord/data', (req, res, next) => {
+    let { columnArr, positionArr, isNotSplit } = req.body;
+    let countObj = {
+        tatol: 0, success: 0, error: 0
+    };
+    dataBase.find({}, (err, data) => {
+        if (err) {
+            console.log(err);
+        } else {
+            data = JSON.parse(JSON.stringify(data));
+
+            data.forEach((item, i) => {
+                let obj = {};
+                let unsetObj = {};
+                columnArr.forEach((key, index) => {
+                    if (isNotSplit === 'no') {
+                        unsetObj[key] = "";
+                    }
+
+                    // let newText = item[key];
+                    
+                    let textArr = []
+                    for (let index = 0; index < positionArr.length; index++) {
+                        textArr = item[key].split(new RegExp(positionArr[index], 'gi'));
+                    }
+                    for (const ik in item) {
+                        if (ik === key) {
+                            textArr.forEach((text, n) => {
+                                obj[key + `_${n + 1}`] = text;
+                            })
+                        }
+                    }
+                });
+
+                dataBase.updateOne({ _id: item._id }, { $set: obj, $unset: unsetObj }, (err) => {
+                    resCallBack(err, countObj, data, res);
+                });
+
+            });
+
         }
     })
 })

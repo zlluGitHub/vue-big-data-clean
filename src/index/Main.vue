@@ -18,8 +18,9 @@
         <transition name="transition-drawer">
           <div
             class="preview scrollbar"
+            ref="preview"
+            v-show="previewData.tableData && previewData.columns"
             :style="previewStyle"
-            v-if="previewData.tableData && previewData.columns"
           >
             <PreviewTable :data="previewData.tableData" :column="previewData.columns" />
           </div>
@@ -133,6 +134,8 @@ export default {
     let scrollHeight = -1;
     // 监听这个dom的scroll事件
     source.onscroll = () => {
+      let preview = this.$refs.preview;
+      preview.scrollTop = source.scrollTop;
       let residualHeight = indexTableWarp.offsetHeight - (source.scrollTop + this.height);
 
       if (isLoading && scrollHeight !== residualHeight && residualHeight < 2000) {
@@ -144,7 +147,7 @@ export default {
           pageSize: 200 * pageNo,
           callBack: (data) => {
             pageNo = pageNo + 1;
-            console.log(data.count ,this.tableData.length);
+            console.log(data.count, this.tableData.length);
             isLoading = data.count !== this.tableData.length;
           },
         });

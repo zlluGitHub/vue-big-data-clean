@@ -75,18 +75,18 @@ export const moduleConfig = {
         // },
     ],
    
-    // splitColumn: [
-    //     {
-    //         title: "以某个定界符拆分",
-    //         type: "word-replace",
-    //     },
-    //     {
-    //         title: "两个定界符之间拆分",
-    //         type: "insert-replace",
-    //     },
-    //     {
-    //         title: "根据定界符位置拆分",
-    //         type: "insert-replace",
-    //     },
-    // ]
+    split: [
+        {
+            title: "根据字符或字符串拆分",
+            type: "split-word",
+        },
+        // {
+        //     title: "两个定界符之间拆分",
+        //     type: "insert-replace",
+        // },
+        {
+            title: "根据字符位置拆分",
+            type: "split-position",
+        },
+    ]
 }

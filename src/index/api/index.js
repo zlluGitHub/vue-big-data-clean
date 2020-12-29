@@ -85,3 +85,19 @@ export function reqDateTimeFormat(data) {
         data
     })
 }
+// 根据字位置拆分
+export function reqSplitPosition(data) {
+    return request({
+        url: '/dataClear/splitPosition/data',
+        method: 'post',
+        data
+    })
+}
+// 根据字符或字符串拆分
+export function reqSplitWord(data) {
+    return request({
+        url: '/dataClear/splitWord/data',
+        method: 'post',
+        data
+    })
+}

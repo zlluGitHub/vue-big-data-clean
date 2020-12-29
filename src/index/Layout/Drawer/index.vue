@@ -72,6 +72,20 @@
     >
       <DateFormat :moduleObj="moduleObj" />
     </div>
+    <div
+      v-else-if="moduleObj.type === 'split-position'"
+      class="zl-drawer-item"
+      :style="style"
+    >
+      <SplitPosition :moduleObj="moduleObj" />
+    </div>
+    <div
+      v-else-if="moduleObj.type === 'split-word'"
+      class="zl-drawer-item"
+      :style="style"
+    >
+      <SplitWord :moduleObj="moduleObj" />
+    </div>
     <div v-else></div>
     <!-- </transition> -->
   </div>
@@ -87,6 +101,8 @@ import DeleteColumns from "../../Modules/DeleteColumns";
 import ToLowerCase from "../../Modules/ToLowerCase";
 import ToUpperCase from "../../Modules/ToUpperCase";
 import DateFormat from "../../Modules/DateFormat";
+import SplitPosition from "../../Modules/SplitPosition";
+import SplitWord from "../../Modules/SplitWord";
 export default {
   components: {
     DataStatistics,
@@ -98,7 +114,9 @@ export default {
     DeleteColumns,
     ToLowerCase,
     ToUpperCase,
-    DateFormat
+    DateFormat,
+    SplitPosition,
+    SplitWord
   },
   data() {
     return {

@@ -8,6 +8,7 @@
             @on-change="handleOnChangeSelectColumn"
             :optionList="optionList"
             ref="selectColumn"
+            :isSetSelectColumns="true"
           />
         </div>
       </li>
@@ -100,7 +101,7 @@ export default {
               this.$event.emit("loading", false);
               if (res.data.code === 200) {
                 this.handleData(this.columnArr);
-                this.handleClear();
+                this.$refs.selectColumn.handleClear();
                 this.$Modal.success({
                   title: "系统提示",
                   content: `总共：${res.data.tatol}条，成功：${res.data.success}条，失败：${res.data.error}条`,

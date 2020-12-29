@@ -6,8 +6,8 @@
         <div class="content">
           <SelectColumn
             @on-change="handleOnChangeSelectColumn"
-            :optionList="optionList"
             ref="selectColumn"
+            :isSetSelectColumns="true"
           />
         </div>
       </li>

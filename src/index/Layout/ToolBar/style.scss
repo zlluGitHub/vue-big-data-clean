@@ -68,6 +68,11 @@
     }
     .left {
         display: flex;
+        ul{
+            li{
+                margin-right: 10px;
+            }
+        }
         ol {
             width: 200px;
             top: 35px;

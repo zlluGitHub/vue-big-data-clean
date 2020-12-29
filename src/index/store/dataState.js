@@ -2,7 +2,7 @@
 
 import { deepClone } from "../utils/index";
 import { reqGetData, reqQualityStatistics, reqKeyStatistics } from "../api";
-import { processingModule } from "../utils/processing";
+import { processingModule, storeObj } from "../utils/processing";
 const state = {
   pageInfo: {
     pageSize: 200,
@@ -68,7 +68,7 @@ const mutations = {
     state.copyData = deepClone(data);
   },
   setModuleStep(state, data) {
-    console.log(data, 'asdasdasdasd');
+    // console.log(data, 'asdasdasdasd');
     if (data.isLast) {
       state.moduleStep.push({
         module: data.module,
@@ -91,46 +91,71 @@ const mutations = {
     state.data = deepClone(data);
   },
   setColumns(state, data) {
+    // console.log(data);
     if (data && data.length) {
-      let newData = data.map(item => {
-        if (item.value && item.label) {
-          return item
-        } else {
+      if (data[0] && data[0].label && data[0].value) {
+        data.sort((a, b) => a.label.localeCompare(b.label));
+        state.columns = data;
+      } else {
+        data.sort((a, b) => a.localeCompare(b));
+        state.columns = data.map(item => {
           return {
             label: item,
             value: item
           }
-        }
-      })
-      state.columns = deepClone(newData)
+        })
+      }
+      // state.columns = deepClone(newData)
     } else {
       state.columns = []
     }
   },
   setColumnsCopy(state, data) {
     if (data && data.length) {
-      let newData = data.map(item => {
-        if (item.value && item.label) {
-          return item
-        } else {
+      if (data[0] && data[0].label && data[0].value) {
+        data.sort((a, b) => a.label.localeCompare(b.label));
+        state.columnsCopy = data;
+      } else {
+        data.sort((a, b) => a.localeCompare(b));
+        state.columnsCopy = data.map(item => {
           return {
             label: item,
             value: item
           }
-        }
-      })
-      state.columnsCopy = deepClone(newData)
+        })
+      }
+
+      // state.columns = deepClone(newData)
     } else {
       state.columnsCopy = []
     }
+
+    // if (data && data.length) {
+    //   let newData = data.map(item => {
+    //     if (item.value && item.label) {
+    //       return item
+    //     } else {
+    //       return {
+    //         label: item,
+    //         value: item
+    //       }
+    //     }
+    //   })
+    //   state.columnsCopy = deepClone(newData)
+    // } else {
+    //   state.columnsCopy = []
+    // }
   },
 
   setSelectColumns(state, data) {
+    console.log(data);
     state.selectColumns = data;
     if (data && data.length) {
-      let newColumns = state.columnsCopy.map((item) => {
-        if (data.indexOf(item.value) > -1) {
-          return { ...item, ...{ zl_state: "source" } };
+      let keyArr = data.map(each => each.key);
+      let newColumns = state.columnsCopy.map((item, i) => {
+        let position = keyArr.indexOf(item.value);
+        if (position > -1) {
+          return { ...item, ...{ zl_state: data[position].state } };
         } else {
           return item;
         }
@@ -160,14 +185,28 @@ const actions = {
         let columnsCopy = [];
         commit('setData', data)
         commit('setCopyData', data);
-        if (data.length) {
-          for (const key in data[0]) {
-            if (key !== '_id') {
-              columnsCopy.push(key);
-            };
-          };
-        };
+        // if (data.length) {
+        //   for (const key in data[0]) {
+        //     if (key !== '_id') {
+        //       columnsCopy.push(key);
+        //     };
+        //   };
+        // };
 
+        // data.Object.keys(newData[0]);
+
+        data.forEach(item => {
+          columnsCopy.push(Object.keys(item))
+        })
+
+        let length = 0, columnsLengthArr = [];
+        columnsCopy.forEach(arr => {
+          if (arr.length > length) {
+            length = arr.length;
+            columnsLengthArr = arr;
+          }
+        })
+        columnsCopy = columnsLengthArr;
         commit('setColumnsCopy', deepClone(columnsCopy));
 
         // // 分页加载处理
@@ -191,11 +230,12 @@ const actions = {
         // } else {
         let lastStepObj = state.lastStepObj
         if (JSON.stringify(lastStepObj.module) !== "{}") {
+          // console.log(state.lastStepObj);
           let { tableData, columns } = processingModule(deepClone(data), state.lastStepObj, 'view');
           if (lastStepObj.module.type === 'columns-into-array' || lastStepObj.module.type === 'columns-into-object') {
             commit("setPreviewData", { tableData, columns });
           } else {
-            commit('setData', tableData)
+            commit('setData', tableData);
             columnsCopy = columns ? columns : columnsCopy;
           };
         };

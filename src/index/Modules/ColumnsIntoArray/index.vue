@@ -4,7 +4,11 @@
       <li>
         <div class="title">选择列数据</div>
         <div class="content">
-          <SelectColumn @on-change="handleOnChangeSelectColumn" ref="selectColumn" />
+          <SelectColumn
+            @on-change="handleOnChangeSelectColumn"
+            ref="selectColumn"
+            :isSetSelectColumns="true"
+          />
         </div>
       </li>
       <li>
@@ -161,7 +165,7 @@ export default {
         },
         isLast: mark,
       });
-    }
+    },
   },
 };
 </script>

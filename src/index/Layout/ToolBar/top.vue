@@ -58,6 +58,23 @@
           </transition>
         </li>
         <li>
+          <div @click="handleMenuSwitch('split')">
+            <img src="../../assets/split.svg" />
+            <img src="../../assets/xxjt.svg" class="arrow-icon" />
+          </div>
+          <transition name="show">
+            <ol v-if="moduleConfig.split && menuType === 'split'">
+              <li
+                v-for="(item, i) in moduleConfig.split"
+                :key="i"
+                @click="handleMenuClickItem(item)"
+              >
+                {{ item.title }}
+              </li>
+            </ol>
+          </transition>
+        </li>
+        <li>
           <div @click="handleMenuSwitch('delete')">
             <img
               src="../../assets/decon.svg"
@@ -68,6 +85,7 @@
         </li>
       </ul>
     </div>
+
     <div class="right">
       <ul>
         <li>
