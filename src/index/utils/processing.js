@@ -501,6 +501,48 @@ export const splitWord = (newData, option, mark) => {
     return { columns, tableData: newData }
 };
 
+export const mergeColumns = (newData, option, mark) => {
+    let { columnArr, columnName, splitWordValue } = option;
+    let columnNamePar = "";
+    let newTableData = newData.map((item, i) => {
+        let itemObj = {};
+        let newContent = "";
+        columnArr.forEach((key, index) => {
+            if (item[key]) {
+                // newObj[key] = item[key];
+                newContent = newContent + splitWordValue + item[key];
+                columnNamePar = columnName ? columnName : 'column_name';
+            };
+        });
+        newContent = newContent.slice(splitWordValue.length,newContent.length)
+
+        if (mark === "view") {
+            itemObj[columnNamePar] = newContent;
+            return itemObj;
+        } else {
+            item[columnNamePar] = newContent;
+            return item;
+        }
+    });
+
+    let newColumns = [{
+        label: columnNamePar,
+        value: columnNamePar,
+    }];
+    if (mark !== "view") {
+        let columns = []
+
+        for (const key in newData[0]) {
+            columns.push({
+                label: key,
+                value: key,
+            })
+        }
+        newColumns = columns;
+    }
+    return { columns: newColumns, tableData: newTableData }
+}
+
 export const processingModule = (data, itemData, mark) => {
     let { module, paramObj } = itemData;
     if (module.type === 'replace-word') {
@@ -525,5 +567,7 @@ export const processingModule = (data, itemData, mark) => {
         return splitPosition(data, paramObj, mark);
     } else if (module.type === 'split-word') {
         return splitWord(data, paramObj, mark);
+    } else if (module.type === 'merge-columns') {
+        return mergeColumns(data, paramObj, mark);
     }
 }

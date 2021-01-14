@@ -86,6 +86,13 @@
     >
       <SplitWord :moduleObj="moduleObj" />
     </div>
+    <div
+      v-else-if="moduleObj.type === 'merge-columns'"
+      class="zl-drawer-item"
+      :style="style"
+    >
+      <MergeColumns :moduleObj="moduleObj" />
+    </div>
     <div v-else></div>
     <!-- </transition> -->
   </div>
@@ -103,6 +110,7 @@ import ToUpperCase from "../../Modules/ToUpperCase";
 import DateFormat from "../../Modules/DateFormat";
 import SplitPosition from "../../Modules/SplitPosition";
 import SplitWord from "../../Modules/SplitWord";
+import MergeColumns from "../../Modules/MergeColumns";
 export default {
   components: {
     DataStatistics,
@@ -116,7 +124,8 @@ export default {
     ToUpperCase,
     DateFormat,
     SplitPosition,
-    SplitWord
+    SplitWord,
+    MergeColumns
   },
   data() {
     return {

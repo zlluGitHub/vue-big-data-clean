@@ -74,6 +74,15 @@
             </ol>
           </transition>
         </li>
+          <li>
+          <div @click="handleMenuSwitch('merge')">
+            <img
+              src="../../assets/hb.svg"
+              class="zl_icon"
+              @click="handleMenuClickItem(moduleConfig.merge)"
+            />
+          </div>
+        </li>
         <li>
           <div @click="handleMenuSwitch('delete')">
             <img
@@ -83,6 +92,7 @@
             />
           </div>
         </li>
+      
       </ul>
     </div>
 

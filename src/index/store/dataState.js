@@ -232,7 +232,7 @@ const actions = {
         if (JSON.stringify(lastStepObj.module) !== "{}") {
           // console.log(state.lastStepObj);
           let { tableData, columns } = processingModule(deepClone(data), state.lastStepObj, 'view');
-          if (lastStepObj.module.type === 'columns-into-array' || lastStepObj.module.type === 'columns-into-object') {
+          if (lastStepObj.module.type === 'columns-into-array' || lastStepObj.module.type === 'columns-into-object'|| lastStepObj.module.type === 'merge-columns') {
             commit("setPreviewData", { tableData, columns });
           } else {
             commit('setData', tableData);

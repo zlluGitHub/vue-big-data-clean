@@ -3,10 +3,11 @@ export const moduleConfig = {
         title: "数据统计信息",
         type: "data-tatistics",
     },
-    delete:{
+    delete: {
         title: "删除列数据",
         type: "columns-delete",
     },
+
 
     arrAndObj: [
         {
@@ -74,7 +75,7 @@ export const moduleConfig = {
         //     type: "insert-replace",
         // },
     ],
-   
+
     split: [
         {
             title: "根据字符或字符串拆分",
@@ -88,5 +89,9 @@ export const moduleConfig = {
             title: "根据字符位置拆分",
             type: "split-position",
         },
-    ]
+    ],
+    merge: {
+        title: "合并列数据",
+        type: "merge-columns",
+    },
 }

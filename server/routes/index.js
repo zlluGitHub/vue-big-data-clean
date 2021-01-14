@@ -291,7 +291,7 @@ router.post('/delete/data', (req, res, next) => {
                     let obj = {}
 
                     columns.forEach(key => {
-                            obj[key] = "";
+                        obj[key] = "";
                     });
                     // console.log(obj);
                     dataBase.updateOne({ _id: item._id }, { $unset: obj }, (err) => {
@@ -735,7 +735,7 @@ router.post('/splitWord/data', (req, res, next) => {
                     }
 
                     // let newText = item[key];
-                    
+
                     let textArr = []
                     for (let index = 0; index < positionArr.length; index++) {
                         textArr = item[key].split(new RegExp(positionArr[index], 'gi'));
@@ -750,6 +750,38 @@ router.post('/splitWord/data', (req, res, next) => {
                 });
 
                 dataBase.updateOne({ _id: item._id }, { $set: obj, $unset: unsetObj }, (err) => {
+                    resCallBack(err, countObj, data, res);
+                });
+
+            });
+
+        }
+    })
+})
+// 根据字符或字符串合并
+router.post('/mergeColumns/data', (req, res, next) => {
+    let { columnArr, columnName, splitWordValue } = req.body;
+    let countObj = {
+        tatol: 0, success: 0, error: 0
+    };
+    dataBase.find({}, (err, data) => {
+        if (err) {
+            console.log(err);
+        } else {
+            data = JSON.parse(JSON.stringify(data));
+
+            data.forEach((item, i) => {
+                let obj = {}, newContent = "";
+                columnArr.forEach((key, index) => {
+                    if (item[key]) {
+                        // newObj[key] = item[key];
+                        newContent = newContent + splitWordValue + item[key];
+                        columnNamePar = columnName ? columnName : 'column_name';
+                    };
+                });
+
+                obj[columnNamePar] = newContent.slice(splitWordValue.length, newContent.length);
+                dataBase.updateOne({ _id: item._id }, { $set: obj }, (err) => {
                     resCallBack(err, countObj, data, res);
                 });
 

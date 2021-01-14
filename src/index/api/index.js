@@ -101,3 +101,11 @@ export function reqSplitWord(data) {
         data
     })
 }
+// 根据字符或字符串合并
+export function reqMergeColumns(data) {
+    return request({
+        url: '/dataClear/mergeColumns/data',
+        method: 'post',
+        data
+    })
+}
